@@ -2,20 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <title>Secure Admin Control Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-white p-6 md:p-12">
-    <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-2xl font-bold text-indigo-400">Captured System Logs (30-day retention)</h1>
-            <button onclick="loadLogs()" class="bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Refresh Data</button>
+<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-box" class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
+        <div class="text-center mb-6">
+            <span class="bg-indigo-500/20 text-indigo-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Restricted Access</span>
+            <h1 class="text-2xl font-bold mt-2 text-white">Admin Authentication</h1>
+            <p class="text-slate-400 text-sm mt-1">Enter credentials to access logs.</p>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Username</label>
+                <input type="text" id="username" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Enter username">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Password</label>
+                <input type="password" id="password" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Enter password">
+            </div>
+            <p id="error-msg" class="text-xs text-rose-500 text-center hidden">Invalid Username or Password!</p>
+            <button onclick="checkLogin()" class="w-full bg-indigo-600 hover:bg-indigo-500 font-semibold py-3 rounded-xl transition shadow-lg shadow-indigo-600/20 text-sm">
+                Login to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- DASHBOARD (Initially Hidden) -->
+    <div id="dashboard-box" class="max-w-6xl w-full mx-auto hidden p-4 md:p-8">
+        <div class="flex justify-between items-center mb-8 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+            <div>
+                <h1 class="text-2xl font-bold text-indigo-400">Captured System Logs</h1>
+                <p class="text-slate-400 text-xs mt-1">Automatic 30-day retention active.</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="loadLogs()" class="bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Refresh</button>
+                <button onclick="logout()" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600/30 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Logout</button>
+            </div>
         </div>
 
         <div id="logs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </div>
 
     <script>
+        // Aapke naye credentials set kar diye gaye hain
+        const ADMIN_USER = "sumit@1123";
+        const ADMIN_PASS = "sumit1123";
+
+        function checkLogin() {
+            const user = document.getElementById("username").value;
+            const pass = document.getElementById("password").value;
+            const errorMsg = document.getElementById("error-msg");
+
+            if (user === ADMIN_USER && pass === ADMIN_PASS) {
+                document.getElementById("login-box").classList.add("hidden");
+                document.getElementById("dashboard-box").classList.remove("hidden");
+                loadLogs();
+            } else {
+                errorMsg.classList.remove("hidden");
+            }
+        }
+
+        function logout() {
+            document.getElementById("dashboard-box").classList.add("hidden");
+            document.getElementById("login-box").classList.remove("hidden");
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+        }
+
         function loadLogs() {
             fetch('/api/get-data')
                 .then(res => res.json())
@@ -54,7 +111,6 @@
                     }
                 });
         }
-        loadLogs();
     </script>
 </body>
 </html>
