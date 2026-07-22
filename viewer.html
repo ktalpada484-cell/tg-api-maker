@@ -33,12 +33,13 @@
 
     <!-- DASHBOARD -->
     <div id="dashboard-box" class="max-w-6xl w-full mx-auto hidden p-4 md:p-8">
-        <div class="flex justify-between items-center mb-8 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 bg-slate-900 border border-slate-800 p-6 rounded-2xl gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-indigo-400">Captured System Logs</h1>
                 <p class="text-slate-400 text-xs mt-1">Automatic background data sync active.</p>
             </div>
-            <div class="flex gap-3">
+            <div class="flex flex-wrap gap-3">
+                <button onclick="downloadDataJSON()" class="bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/20">Download JSON</button>
                 <button onclick="loadLogs()" class="bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Refresh</button>
                 <button onclick="logout()" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600/30 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Logout</button>
             </div>
@@ -50,6 +51,7 @@
     <script>
         const ADMIN_USER = "sumit@1123";
         const ADMIN_PASS = "sumit1123";
+        let globalLogsData = {}; // Store fetched logs globally for downloading
 
         function checkLogin() {
             const user = document.getElementById("username").value;
@@ -76,6 +78,7 @@
             fetch('/api/get-data')
                 .then(res => res.json())
                 .then(data => {
+                    globalLogsData = data; // Save data locally for download feature
                     const grid = document.getElementById("logs-grid");
                     grid.innerHTML = "";
 
@@ -135,6 +138,21 @@
                         grid.appendChild(card);
                     }
                 });
+        }
+
+        // Function to download logs as a JSON file
+        function downloadDataJSON() {
+            if (Object.keys(globalLogsData).length === 0) {
+                alert("No data available to download!");
+                return;
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalLogsData, null, 4));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "system_logs_" + Date.now() + ".json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
         }
     </script>
 </body>
