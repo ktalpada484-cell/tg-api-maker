@@ -3,524 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Secure Login</title>
+    <title>Advanced Multi-Category Data & Media Viewer</title>
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --accent: #00d2ff;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1);
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+            --accent-camera: #2563eb;
+            --accent-ff: #d97706;
+            --accent-insta: #db2777;
+            --accent-location: #059669;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 10%, #1e293b 0%, #0b0f19 80%);
-            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 20px;
-            min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            min-height: 100vh;
         }
 
-        .login-card {
+        .container {
+            width: 100%;
+            max-width: 1000px;
             background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 35px;
-            width: 100%;
-            max-width: 380px;
-            backdrop-filter: blur(16px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 210, 255, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-color);
             text-align: center;
-        }
-
-        .login-card h2 {
-            margin-bottom: 8px;
-            color: var(--accent);
-            font-size: 22px;
-            font-weight: 800;
-        }
-
-        .login-card p {
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 25px;
-        }
-
-        .input-group {
-            margin-bottom: 18px;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px 14px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            box-sizing: border-box;
-            transition: 0.3s;
-        }
-
-        .input-group input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
-        }
-
-        .login-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-            border: none;
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
-        }
-
-        .login-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .error-msg {
-            color: #ff4757;
-            font-size: 12px;
-            margin-top: 12px;
-            display: none;
-        }
-
-        #dashboardContainer {
-            display: none;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            font-size: 24px;
             margin-bottom: 20px;
-            color: var(--accent);
-            text-align: center;
-            font-weight: 800;
-            text-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
         }
 
-        .top-bar {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            background: rgba(0, 210, 255, 0.1);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 10px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-            backdrop-filter: blur(5px);
-        }
-
-        .action-btn:hover {
-            background: var(--accent);
-            color: #0f172a;
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
-        }
-
+        /* Category Tabs */
         .tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            overflow-x: auto;
         }
 
         .tab-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
+            background-color: #e5e7eb;
+            border: none;
+            padding: 10px 15px;
+            font-size: 0.9rem;
             font-weight: 600;
-            transition: 0.2s;
-            backdrop-filter: blur(10px);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            color: #4b5563;
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-            color: #fff;
-            border-color: transparent;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+            color: white;
         }
 
-        .section-content {
+        .tab-btn[data-target="camera"].active { background-color: var(--accent-camera); }
+        .tab-btn[data-target="ff"].active { background-color: var(--accent-ff); }
+        .tab-btn[data-target="insta"].active { background-color: var(--accent-insta); }
+        .tab-btn[data-target="location"].active { background-color: var(--accent-location); }
+
+        .tab-content {
             display: none;
         }
 
-        .section-content.active {
+        .tab-content.active {
             display: block;
         }
 
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .card-header-flex {
+        .controls {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
+            flex-direction: column;
+            gap: 15px;
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
         }
 
-        .card h2 {
-            margin: 0;
-            font-size: 18px;
-            color: #fff;
+        .file-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        th, td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
-
-        th {
-            background: rgba(17, 24, 39, 0.8);
-            color: var(--accent);
+        label {
+            font-size: 0.85rem;
             font-weight: 600;
+            color: #4b5563;
         }
 
-        tr:hover {
-            background: rgba(255, 255, 255, 0.03);
+        input[type="file"] {
+            font-size: 0.9rem;
         }
 
-        .captured-img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-        }
-
-        .no-data {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 30px;
-        }
-
-        .download-sub-btn {
-            background: #10b981;
+        .btn {
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 7px 14px;
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            transition: 0.2s;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .download-sub-btn:hover { background: #059669; }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-download {
+            background-color: #10b981;
+        }
+
+        .btn-download:hover {
+            background-color: #059669;
+        }
+
+        .viewer-screen {
+            width: 100%;
+            height: 450px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: #fafafa;
+            position: relative;
+        }
+
+        .placeholder-text {
+            color: #9ca3af;
+            font-size: 1rem;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Screen Elements */
+        .viewer-screen img, 
+        .viewer-screen video, 
+        .viewer-screen iframe {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .viewer-screen pre {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 15px;
+            overflow: auto;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="loginCard" class="login-card">
-        <h2>🔐 Admin Access</h2>
-        <p>Please enter your credentials to view logs</p>
-        <form onsubmit="handleLogin(event)">
-            <div class="input-group">
-                <label>Username</label>
-                <input type="text" id="adminUser" placeholder="Enter username" required>
-            </div>
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="adminPass" placeholder="Enter password" required>
-            </div>
-            <button type="submit" class="login-btn">Login Dashboard</button>
-            <div id="errorMsg" class="error-msg">Invalid Username or Password!</div>
-        </form>
-    </div>
-
-    <div id="dashboardContainer">
-        <h1>🔐 Admin Security Dashboard</h1>
+    <div class="container">
+        <h2>Multi-Category Data & Media Viewer</h2>
         
-        <div class="top-bar">
-            <button class="action-btn" onclick="loadData()">🔄 Refresh Data Logs</button>
-            <button class="action-btn" onclick="logout()" style="border-color:#ff4757; color:#ff4757; background:rgba(255,71,87,0.1);">🔒 Logout</button>
-        </div>
-
+        <!-- Category Navigation Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('ff-data', event)">🎮 FF Account Logs</button>
-            <button class="tab-btn" onclick="switchTab('location-data', event)">📍 Location & Camera</button>
-            <button class="tab-btn" onclick="switchTab('system-logs', event)">💻 System & Browser Logs</button>
+            <button class="tab-btn active" data-target="camera" onclick="switchTab('camera')">📷 Camera Photos & Media</button>
+            <button class="tab-btn" data-target="ff" onclick="switchTab('ff')">🎮 Free Fire Data</button>
+            <button class="tab-btn" data-target="insta" onclick="switchTab('insta')">📸 Instagram Data</button>
+            <button class="tab-btn" data-target="location" onclick="switchTab('location')">📍 Location Data</button>
         </div>
 
-        <div id="ff-data" class="section-content active">
-            <div class="card">
-                <div class="card-header-flex">
-                    <h2>Captured Usernames & Passwords</h2>
-                    <button class="download-sub-btn" onclick="downloadCSV('ff')">📥 Download FF Logs CSV</button>
+        <!-- 1. CAMERA PHOTOS & MEDIA TAB -->
+        <div id="camera-section" class="tab-content active">
+            <div class="controls">
+                <div class="file-input-wrapper">
+                    <label for="cameraUpload">Select Camera Photos / Videos:</label>
+                    <input type="file" id="cameraUpload" accept="image/*,video/*" onchange="handleFile('camera', event)">
                 </div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Platform</th>
-                                <th>Username / ID / Email</th>
-                                <th>Password / Selection</th>
-                                <th>Snapshot</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ffTableBody">
-                            <tr><td colspan="5" class="no-data">Loading records...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            </div>
+            <div class="viewer-screen" id="cameraViewer">
+                <div class="placeholder-text">No camera media uploaded yet.</div>
+            </div>
+            <div class="action-bar">
+                <a id="cameraDownload" href="#" class="btn btn-download hidden" download>📥 Download File</a>
             </div>
         </div>
 
-        <div id="location-data" class="section-content">
-            <div class="card">
-                <div class="card-header-flex">
-                    <h2>Captured Coordinates & Photos</h2>
-                    <button class="download-sub-btn" onclick="downloadCSV('location')">📥 Download Location CSV</button>
+        <!-- 2. FREE FIRE DATA TAB -->
+        <div id="ff-section" class="tab-content">
+            <div class="controls">
+                <div class="file-input-wrapper">
+                    <label for="ffUpload">Upload Free Fire Config / JSON / Data File:</label>
+                    <input type="file" id="ffUpload" accept=".json,.txt,.xml,.dat" onchange="handleFile('ff', event)">
                 </div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Snapshot</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                                <th>Google Maps Link</th>
-                            </tr>
-                        </thead>
-                        <tbody id="locTableBody">
-                            <tr><td colspan="4" class="no-data">Loading location data...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            </div>
+            <div class="viewer-screen" id="ffViewer">
+                <div class="placeholder-text">No Free Fire data file loaded.</div>
+            </div>
+            <div class="action-bar">
+                <a id="ffDownload" href="#" class="btn btn-download hidden" download>📥 Download FF File</a>
             </div>
         </div>
 
-        <div id="system-logs" class="section-content">
-            <div class="card">
-                <div class="card-header-flex">
-                    <h2>Visitor Device & Browser Details</h2>
-                    <button class="download-sub-btn" onclick="downloadCSV('system')">📥 Download System Logs CSV</button>
+        <!-- 3. INSTAGRAM DATA TAB -->
+        <div id="insta-section" class="tab-content">
+            <div class="controls">
+                <div class="file-input-wrapper">
+                    <label for="instaUpload">Upload Instagram Export / JSON / Media:</label>
+                    <input type="file" id="instaUpload" accept=".json,.html,.txt,image/*" onchange="handleFile('insta', event)">
                 </div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Platform</th>
-                                <th>User Agent / Browser Details</th>
-                                <th>Screen Resolution</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sysTableBody">
-                            <tr><td colspan="3" class="no-data">Loading system logs...</td></tr>
-                        </tbody>
-                    </table>
+            </div>
+            <div class="viewer-screen" id="instaViewer">
+                <div class="placeholder-text">No Instagram data file loaded.</div>
+            </div>
+            <div class="action-bar">
+                <a id="instaDownload" href="#" class="btn btn-download hidden" download>📥 Download Insta File</a>
+            </div>
+        </div>
+
+        <!-- 4. LOCATION DATA TAB -->
+        <div id="location-section" class="tab-content">
+            <div class="controls">
+                <div class="file-input-wrapper">
+                    <label for="locationUpload">Upload Location File (JSON / KML / CSV / Text):</label>
+                    <input type="file" id="locationUpload" accept=".json,.kml,.csv,.txt" onchange="handleFile('location', event)">
                 </div>
+            </div>
+            <div class="viewer-screen" id="locationViewer">
+                <div class="placeholder-text">No Location data loaded.</div>
+            </div>
+            <div class="action-bar">
+                <a id="locationDownload" href="#" class="btn btn-download hidden" download>📥 Download Location File</a>
             </div>
         </div>
     </div>
 
     <script>
-        let globalLogs = [];
-
-        window.onload = function() {
-            if (sessionStorage.getItem('admin_logged_in') === 'true') {
-                showDashboard();
-            }
+        // Keep track of active object URLs for cleanup
+        const activeURLs = {
+            camera: null,
+            ff: null,
+            insta: null,
+            location: null
         };
 
-        function handleLogin(event) {
-            event.preventDefault();
-            const u = document.getElementById('adminUser').value;
-            const p = document.getElementById('adminPass').value;
-            const err = document.getElementById('errorMsg');
+        function switchTab(category) {
+            // Remove active states from tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-            if (u === 'sumit@1123' && p === 'sumit1123') {
-                sessionStorage.setItem('admin_logged_in', 'true');
-                showDashboard();
-            } else {
-                err.style.display = 'block';
+            // Add active states to target
+            document.querySelector(`[data-target="${category}"]`).classList.add('active');
+            document.getElementById(`${category}-section`).classList.add('active');
+        }
+
+        function handleFile(category, event) {
+            const file = event.target.files[0];
+            const viewer = document.getElementById(`${category}Viewer`);
+            const downloadBtn = document.getElementById(`${category}Download`);
+
+            if (!file) return;
+
+            // Revoke old URL if present
+            if (activeURLs[category]) {
+                URL.revokeObjectURL(activeURLs[category]);
+            }
+
+            activeURLs[category] = URL.createObjectURL(file);
+
+            // Setup specific download button
+            downloadBtn.href = activeURLs[category];
+            downloadBtn.download = file.name;
+            downloadBtn.classList.remove('hidden');
+
+            // Clear viewer screen
+            viewer.innerHTML = '';
+
+            const fileType = file.type;
+            const fileName = file.name.toLowerCase();
+
+            // Render based on file category and format
+            if (category === 'camera') {
+                if (fileType.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = activeURLs[category];
+                    viewer.appendChild(img);
+                } else if (fileType.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = activeURLs[category];
+                    video.controls = true;
+                    viewer.appendChild(video);
+                } else {
+                    showUnsupported(viewer, file.name);
+                }
+            } 
+            else if (category === 'insta' && fileType.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = activeURLs[category];
+                viewer.appendChild(img);
+            }
+            else {
+                // For Text/JSON/Config data formats (FF, Insta, Location)
+                if (fileType.includes('json') || fileType.includes('text') || fileName.endsWith('.json') || fileName.endsWith('.txt') || fileName.endsWith('.csv') || fileName.endsWith('.kml') || fileName.endsWith('.html')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const pre = document.createElement('pre');
+                        pre.textContent = e.target.result;
+                        viewer.appendChild(pre);
+                    };
+                    reader.readAsText(file);
+                } else if (fileType.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = activeURLs[category];
+                    viewer.appendChild(img);
+                } else {
+                    showUnsupported(viewer, file.name);
+                }
             }
         }
 
-        function showDashboard() {
-            document.getElementById('loginCard').style.display = 'none';
-            document.body.style.display = 'block';
-            document.getElementById('dashboardContainer').style.display = 'block';
-            loadData();
-        }
-
-        function logout() {
-            sessionStorage.removeItem('admin_logged_in');
-            window.location.reload();
-        }
-
-        function switchTab(sectionId, evt) {
-            document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(sectionId).classList.add('active');
-            evt.currentTarget.classList.add('active');
-        }
-
-        function loadData() {
-            fetch('/api/get-ff-data')
-                .then(res => res.json())
-                .then(data => {
-                    globalLogs = data;
-                    renderLogs(data);
-                })
-                .catch(err => {
-                    console.error("Failed to fetch from server:", err);
-                });
-        }
-
-        function renderLogs(logs) {
-            const ffBody = document.getElementById('ffTableBody');
-            const locBody = document.getElementById('locTableBody');
-            const sysBody = document.getElementById('sysTableBody');
-
-            if (!logs || logs.length === 0) {
-                ffBody.innerHTML = `<tr><td colspan="5" class="no-data">No records found yet.</td></tr>`;
-                locBody.innerHTML = `<tr><td colspan="4" class="no-data">No location data found.</td></tr>`;
-                sysBody.innerHTML = `<tr><td colspan="3" class="no-data">No system logs found.</td></tr>`;
-                return;
-            }
-
-            let ffHtml = '';
-            let locHtml = '';
-            let sysHtml = '';
-
-            logs.forEach(item => {
-                let imgTag = item.image_base64 ? `<img src="${item.image_base64}" class="captured-img">` : 'No Image';
-                let timeStr = item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
-
-                ffHtml += `
-                    <tr>
-                        <td><strong>${item.platform || 'N/A'}</strong></td>
-                        <td>${item.instagram_username || 'N/A'}</td>
-                        <td><code style="background:rgba(255,255,255,0.1); padding:3px 6px; border-radius:4px; color:#ff4757;">${item.instagram_password || 'N/A'}</code></td>
-                        <td>${imgTag}</td>
-                        <td>${timeStr}</td>
-                    </tr>
-                `;
-
-                let lat = item.location?.latitude || 'N/A';
-                let lon = item.location?.longitude || 'N/A';
-                let mapLink = (lat !== 'N/A' && lon !== 'N/A') ? `<a href="https://maps.google.com/?q=${lat},${lon}" target="_blank" style="color:var(--accent); font-weight:600;">Open Map ↗</a>` : 'Not Available';
-                
-                locHtml += `
-                    <tr>
-                        <td>${imgTag}</td>
-                        <td>${lat}</td>
-                        <td>${lon}</td>
-                        <td>${mapLink}</td>
-                    </tr>
-                `;
-
-                sysHtml += `
-                    <tr>
-                        <td>${item.platform || 'Web'}</td>
-                        <td style="font-size:12px; word-break:break-all; color:#94a3b8;">${item.system?.userAgent || navigator.userAgent}</td>
-                        <td>${window.innerWidth}x${window.innerHeight}</td>
-                    </tr>
-                `;
-            });
-
-            ffBody.innerHTML = ffHtml;
-            locBody.innerHTML = locHtml;
-            sysBody.innerHTML = sysHtml;
-        }
-
-        function downloadCSV(type) {
-            if (!globalLogs || globalLogs.length === 0) {
-                alert('No data available to download!');
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8,";
-            let filename = "";
-
-            if (type === 'ff') {
-                csvContent += "Platform,Username_or_Email,Password_or_Selection,Time\r\n";
-                globalLogs.forEach(row => {
-                    csvContent += `"${row.platform || ''}","${row.instagram_username || ''}","${row.instagram_password || ''}","${row.timestamp || ''}"\r\n`;
-                });
-                filename = "FF_Account_Credentials.csv";
-            } else if (type === 'location') {
-                csvContent += "Latitude,Longitude,Google_Maps_Link\r\n";
-                globalLogs.forEach(row => {
-                    let lat = row.location?.latitude || 'N/A';
-                    let lon = row.location?.longitude || 'N/A';
-                    csvContent += `"${lat}","${lon}","https://maps.google.com/?q=${lat},${lon}"\r\n`;
-                });
-                filename = "Location_Logs.csv";
-            } else if (type === 'system') {
-                csvContent += "Platform,UserAgent,ScreenResolution\r\n";
-                globalLogs.forEach(row => {
-                    csvContent += `"${row.platform || ''}","${row.system?.userAgent || navigator.userAgent}","${window.innerWidth}x${window.innerHeight}"\r\n`;
-                });
-                filename = "System_Browser_Logs.csv";
-            }
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", filename);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        function showUnsupported(viewer, name) {
+            const div = document.createElement('div');
+            div.className = 'placeholder-text';
+            div.innerHTML = `Preview not directly supported for <strong>${name}</strong>.<br>Use the download button below to access the file.`;
+            viewer.appendChild(div);
         }
     </script>
 </body>
