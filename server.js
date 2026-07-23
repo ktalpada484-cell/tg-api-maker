@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname)));
 
 // MongoDB Connection (Apna password yahan theek se daal lena bina < > ke)
-const MONGO_URI = "mongodb+srv://ktalpada484_db_user:sumit123@cluster0.zjkzamc.mongodb.net/?appName=Cluster0";
+const MONGO_URI = "mongodb+srv://ktalpada484_db_user:sumit1123@cluster0.zjkzamc.mongodb.net/?appName=Cluster0";
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("MongoDB Connected Successfully! Data is permanent."))
