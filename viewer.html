@@ -215,6 +215,21 @@
             border: 1px solid var(--glass-border);
         }
 
+        .map-link {
+            color: #38bdf8;
+            text-decoration: none;
+            font-weight: bold;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-block;
+        }
+
+        .map-link:hover {
+            background: rgba(56, 189, 248, 0.2);
+        }
+
         .action-bar {
             display: flex;
             justify-content: flex-end;
@@ -319,7 +334,6 @@
             const pass = document.getElementById("passwordInput").value.trim();
             const errorMsg = document.getElementById("errorMsg");
 
-            // Direct check for credentials sumit@1123 / sumit1123 or API
             if (user === "sumit@1123" && pass === "sumit1123") {
                 sessionStorage.setItem("isAdminLoggedIn", "true");
                 showDashboard();
@@ -399,7 +413,7 @@
             } else if (type === 'Camera') {
                 html += `<th>Captured Image</th>`;
             } else if (type === 'Location') {
-                html += `<th>Latitude</th><th>Longitude</th>`;
+                html += `<th>Latitude</th><th>Longitude</th><th>Google Maps Link</th>`;
             }
             html += `<th>IP Address</th></tr></thead><tbody>`;
 
@@ -413,7 +427,10 @@
                     let imgTag = log.image_base64 ? `<img src="${log.image_base64}" class="preview-img">` : 'No Image';
                     html += `<td>${imgTag}</td>`;
                 } else if (type === 'Location') {
-                    html += `<td>${log.latitude || 'N/A'}</td><td>${log.longitude || 'N/A'}</td>`;
+                    let lat = log.latitude || '0';
+                    let lon = log.longitude || '0';
+                    let mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                    html += `<td>${lat}</td><td><td>${lon}</td><td><a href="${mapUrl}" target="_blank" class="map-link">📍 View on Map</a></td>`;
                 }
                 html += `<td>${log.ip || 'N/A'}</td></tr>`;
             });
